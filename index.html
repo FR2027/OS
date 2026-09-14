@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FRX OS - Organic UI Simulator</title>
+    <title>FRX OS - Next Gen Organic UI</title>
     <style>
         :root {
-            /* 告別駭客黑！改用溫潤莫蘭迪與柔光色系 */
-            --bg-gradient: linear-gradient(145deg, #181926 0%, #202236 40%, #2e2a3a 70%, #1c2333 100%);
+            --bg-gradient: linear-gradient(155deg, #12131C 0%, #1A1C2E 40%, #2A2538 75%, #182030 100%);
             --glass-card: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.18);
             --glass-hover: rgba(255, 255, 255, 0.15);
             --accent-warm: #f6b179;
             --accent-soft: #a0c4ff;
+            --accent-mint: #9bf6ff;
             --text-main: #ffffff;
             --text-sub: rgba(255, 255, 255, 0.65);
         }
@@ -27,7 +27,7 @@
         }
 
         body {
-            background-color: #0b0c10;
+            background-color: #08090c;
             color: var(--text-main);
             height: 100vh;
             overflow: hidden;
@@ -36,28 +36,26 @@
             align-items: center;
         }
 
-        /* ==================== 1. 高質感極簡加載頁面 ==================== */
+        /* 1. 加載頁面 */
         #loader {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #12131c;
+            background: #0d0e15;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 1.2s ease, visibility 1.2s;
+            transition: opacity 1s ease, visibility 1s;
         }
 
         .frx-logo {
             font-size: 2.8rem;
             font-weight: 300;
             letter-spacing: 8px;
-            color: #ffffff;
-            background: linear-gradient(90deg, #ffffff, #f6b179);
+            background: linear-gradient(90deg, #ffffff, var(--accent-warm));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: softPulse 2.5s infinite alternate ease-in-out;
         }
 
         .loader-bar-container {
@@ -70,21 +68,13 @@
 
         .loader-bar {
             width: 0%; height: 100%;
-            background: linear-gradient(90deg, #f6b179, #a0c4ff);
-            animation: loadProgress 2s forwards cubic-bezier(0.65, 0, 0.35, 1);
+            background: linear-gradient(90deg, var(--accent-warm), var(--accent-soft));
+            animation: loadProgress 1.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        @keyframes softPulse {
-            0% { opacity: 0.6; transform: scale(0.98); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
-        @keyframes loadProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        /* ==================== 2. 手機機身與流光背景 ==================== */
+        /* 2. 手機容器 */
         .phone-container {
             width: 380px;
             height: 780px;
@@ -96,7 +86,7 @@
             overflow: hidden;
             opacity: 0;
             transform: scale(0.96);
-            transition: opacity 1s ease, transform 1s ease;
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
         .phone-container.active {
@@ -104,7 +94,6 @@
             transform: scale(1);
         }
 
-        /* 溫柔質感壁紙 (柔和溫暖的色彩漸變) */
         .phone-screen {
             width: 100%;
             height: 100%;
@@ -114,26 +103,7 @@
             position: relative;
         }
 
-        /* 背景流體柔光球 (模擬高質感光影) */
-        .screen-ambient-1 {
-            position: absolute;
-            top: -50px; right: -50px;
-            width: 250px; height: 250px;
-            background: radial-gradient(circle, rgba(246, 177, 121, 0.25) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .screen-ambient-2 {
-            position: absolute;
-            bottom: 50px; left: -50px;
-            width: 280px; height: 280px;
-            background: radial-gradient(circle, rgba(160, 196, 255, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        /* 頂部狀態列與動態島 */
+        /* 頂部狀態列 & 動態島 */
         .status-bar {
             height: 44px;
             padding: 0 24px;
@@ -142,7 +112,6 @@
             align-items: center;
             font-size: 0.8rem;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
             z-index: 100;
             pointer-events: none;
         }
@@ -162,7 +131,7 @@
             pointer-events: none;
         }
 
-        /* ==================== 滑動視圖與有機佈局 ==================== */
+        /* 滑動視圖 */
         .viewport-wrapper {
             flex: 1;
             width: 100%;
@@ -178,70 +147,39 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .pages-viewport.dragging {
-            transition: none;
-        }
+        .pages-viewport.dragging { transition: none; }
 
         .page {
             width: 33.3333%;
             height: 100%;
             overflow-y: auto;
-            padding: 10px 20px 20px 20px;
+            padding: 10px 20px 80px 20px; /* 留出底部 Dock 空間 */
             scrollbar-width: none;
         }
+        .page::-webkit-scrollbar { display: none; }
 
-        .page::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* ==================== 特殊有機流體卡片 (Fluid Organic Cards) ==================== */
+        /* Widget 與卡片樣式 */
         .card-organic {
             background: var(--glass-card);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            padding: 22px;
-            margin-bottom: 20px;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            position: relative;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
-        /* 特殊形狀：非對稱曲線流體膠囊卡片 */
         .card-asymmetric {
-            border-radius: 38px 20px 38px 38px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 100%);
+            border-radius: 36px 18px 36px 36px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 100%);
         }
 
-        .clock-widget .brand-tag {
-            font-size: 0.68rem;
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: var(--accent-warm);
-            margin-bottom: 6px;
-        }
-
-        .clock-widget .time {
-            font-size: 3.2rem;
-            font-weight: 200;
-            letter-spacing: -1.5px;
-            line-height: 1;
-            color: #ffffff;
-        }
-
-        .clock-widget .date {
-            font-size: 0.82rem;
-            color: var(--text-sub);
-            margin-top: 8px;
-            font-weight: 400;
-        }
-
-        /* 非對稱/流動式 App 佈局 (Organic Grid) */
-        .app-cluster {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: space-between;
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px 10px;
             margin-bottom: 20px;
         }
 
@@ -253,29 +191,26 @@
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .app-item:active {
-            transform: scale(0.9);
-        }
+        .app-item:active { transform: scale(0.88); }
 
-        /* 純白柔光 Squircle 圖示 */
         .app-icon {
-            width: 62px;
-            height: 62px;
+            width: 58px;
+            height: 58px;
             background: rgba(255, 255, 255, 0.09);
             border: 1px solid rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 22px; /* 更圓潤柔和 */
+            border-radius: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 6px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+            position: relative;
         }
 
         .app-icon svg {
-            width: 25px;
-            height: 25px;
+            width: 24px;
+            height: 24px;
             fill: none;
             stroke: #ffffff;
             stroke-width: 1.6;
@@ -283,18 +218,30 @@
             stroke-linejoin: round;
         }
 
-        .app-name {
-            font-size: 0.7rem;
-            color: var(--text-sub);
-            font-weight: 400;
+        /* 標記可開啟互動的 App 標籤 */
+        .interactive-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-warm);
+            border-radius: 50%;
+            border: 2px solid #1a1c2e;
         }
 
-        /* 柔和膠囊分頁指示器 */
+        .app-name {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+        }
+
+        /* 分頁指示器 */
         .pagination-dots {
-            height: 20px;
+            position: absolute;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: center;
-            align-items: center;
             gap: 8px;
             z-index: 10;
         }
@@ -308,47 +255,93 @@
         }
 
         .dot.active {
-            width: 20px;
+            width: 18px;
             border-radius: 10px;
             background: #ffffff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
-        /* 底部膠囊 Dock 欄 */
-        .dock-container {
-            padding: 6px 20px 12px 20px;
-            z-index: 10;
+        /* ==================== 🚀 創新亮點：動態膠囊擴展 DOCK ==================== */
+        .dock-wrapper {
+            position: absolute;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 90;
+            width: 90%;
+            display: flex;
+            justify-content: center;
         }
 
-        .dock {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(35px);
-            -webkit-backdrop-filter: blur(35px);
+        .fluid-dock {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 35px;
-            padding: 10px 18px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .dock-app-list {
             display: flex;
             justify-content: space-between;
+            width: 100%;
             align-items: center;
         }
 
-        .dock .app-item { margin-bottom: 0; }
-        .dock .app-icon {
+        .dock-app-list .app-icon {
+            width: 44px;
+            height: 44px;
             margin-bottom: 0;
             background: transparent;
             border: none;
             box-shadow: none;
         }
 
-        .home-indicator {
-            width: 120px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 10px;
-            margin: 4px auto 6px auto;
+        /* ==================== 互動 APP MODAL 彈窗 ==================== */
+        .app-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 19, 28, 0.95);
+            backdrop-filter: blur(30px);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 24px 30px 24px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(100%);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 溫和提示彈窗 (Toast) */
+        .app-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title { font-size: 1.3rem; font-weight: 500; }
+        .close-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+        }
+
+        /* 提示 Toast */
         .toast-notification {
             position: absolute;
             top: 55px;
@@ -361,137 +354,182 @@
             padding: 8px 18px;
             font-size: 0.75rem;
             color: #ffffff;
-            letter-spacing: 0.5px;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 200;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 400;
         }
-
-        .toast-notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-    <!-- 1. 加載頁面 -->
     <div id="loader">
         <div class="frx-logo">FRX OS</div>
-        <div class="loader-bar-container">
-            <div class="loader-bar"></div>
-        </div>
+        <div class="loader-bar-container"><div class="loader-bar"></div></div>
     </div>
 
-    <!-- 2. 手機系統畫面 -->
     <div class="phone-container" id="phone">
         <div class="phone-screen">
             
-            <!-- 背景柔光光暈 -->
-            <div class="screen-ambient-1"></div>
-            <div class="screen-ambient-2"></div>
-
-            <!-- 狀態列 & 動態島 -->
             <div class="status-bar">
                 <span>09:41</span>
                 <span>5G ●</span>
             </div>
             <div class="dynamic-island"></div>
+            <div class="toast-notification" id="toast">FRX OS Preview Mode</div>
 
-            <!-- 提示彈窗 -->
-            <div class="toast-notification" id="toast">FRX OS · Pure Interface Preview</div>
-
-            <!-- 滑動區域 -->
+            <!-- 視圖區域 -->
             <div class="viewport-wrapper" id="viewportWrapper">
                 <div class="pages-viewport" id="viewport">
                     
-                    <!-- Page 0: 流體 Widget 中心 -->
+                    <!-- Page 0: Widget Center (擴增內容) -->
                     <div class="page">
-                        <div style="font-size:0.75rem; font-weight:600; color:var(--accent-warm); margin-bottom:15px; letter-spacing:2px;">FLUID HUB</div>
+                        <div style="font-size:0.75rem; font-weight:600; color:var(--accent-warm); margin-bottom:12px; letter-spacing:2px;">WIDGET HUB</div>
                         
-                        <div class="card-organic card-asymmetric">
-                            <div style="font-size: 0.7rem; color: var(--text-sub); letter-spacing: 1px;">CREATIVE FLOW</div>
-                            <div style="font-size: 1.3rem; font-weight: 300; margin-top:6px; color:#fff;">Inspire Your Mind</div>
-                            <div style="font-size: 0.75rem; color: var(--accent-soft); margin-top:8px;">12 Active Nodes</div>
+                        <!-- 音樂小工具 (可互動) -->
+                        <div class="card-organic" id="widgetMusicCard" style="cursor:pointer;">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <div style="width:50px; height:50px; border-radius:16px; background:linear-gradient(45deg, #ff758c, #ff7eb3); display:flex; justify-content:center; align-items:center;">
+                                    <svg style="width:24px; stroke:#fff; fill:none; stroke-width:2;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-size:0.7rem; color:var(--text-sub);">NOW PLAYING</div>
+                                    <div style="font-size:0.95rem; font-weight:500;" id="trackTitle">Midnight City Ambient</div>
+                                    <div style="font-size:0.75rem; color:var(--accent-soft);">Tap to Open Music Player</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="card-organic">
+                        <!-- 靈感筆記 (可互動) -->
+                        <div class="card-organic card-asymmetric" id="widgetNoteCard" style="cursor:pointer;">
+                            <div style="font-size:0.7rem; color:var(--accent-warm);">QUICK NOTE</div>
+                            <div style="font-size:1.1rem; font-weight:300; margin-top:6px;" id="notePreview">"Design is how it works."</div>
+                            <div style="font-size:0.7rem; color:var(--text-sub); margin-top:8px;">Tap to edit note →</div>
+                        </div>
+
+                        <!-- 天氣小工具 (可互動) -->
+                        <div class="card-organic" id="widgetWeatherCard" style="cursor:pointer;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <div style="font-size:0.7rem; color:var(--text-sub);">SOUNDSCAPE</div>
-                                    <div style="font-size:0.95rem; font-weight:400; margin-top:2px;">Ambient Horizon</div>
+                                    <div style="font-size:0.7rem; color:var(--text-sub);">TAOYUAN CITY</div>
+                                    <div style="font-size:1.8rem; font-weight:200;">24°C</div>
                                 </div>
-                                <svg style="width:22px; stroke:#ffffff; fill:none; stroke-width:1.5;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                <div style="font-size:0.8rem; color:var(--accent-mint);">Sunny & Clear</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Page 1: 主頁 (Main Organic Home Screen) -->
+                    <!-- Page 1: Home Screen -->
                     <div class="page">
-                        <!-- 非對稱流體時間 Widget -->
-                        <div class="card-organic card-asymmetric clock-widget">
-                            <div class="brand-tag">FRX OS CONCEPT</div>
-                            <div class="time">09:41</div>
-                            <div class="date">MON, SEP 14 — SOFT VISION</div>
+                        <div class="card-organic card-asymmetric">
+                            <div style="font-size:0.68rem; letter-spacing:2px; color:var(--accent-warm);">ORGANIC OS</div>
+                            <div style="font-size:3rem; font-weight:200; line-height:1;">09:41</div>
+                            <div style="font-size:0.8rem; color:var(--text-sub); margin-top:6px;">MON, SEP 14 — TAOYUAN</div>
                         </div>
 
-                        <!-- 聚落式 App 排版 1 -->
-                        <div class="app-cluster">
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><span class="app-name">Call</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="app-name">Chat</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="app-name">Web</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="app-name">Lens</span></div>
+                        <div class="app-grid">
+                            <!-- 帶有 interactive-badge 的代表可以點開試用 -->
+                            <div class="app-item" id="appMusic">
+                                <div class="app-icon"><div class="interactive-badge"></div><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                                <span class="app-name">Music</span>
+                            </div>
+                            <div class="app-item" id="appWeather">
+                                <div class="app-icon"><div class="interactive-badge"></div><svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="5"/></svg></div>
+                                <span class="app-name">Weather</span>
+                            </div>
+                            <div class="app-item" id="appNotes">
+                                <div class="app-icon"><div class="interactive-badge"></div><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+                                <span class="app-name">Notes</span>
+                            </div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="app-name">Camera</span></div>
                         </div>
 
-                        <!-- 聚落式 App 排版 2 -->
-                        <div class="app-cluster">
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="app-name">Star</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="app-name">Audio</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="app-name">Events</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="app-name">Place</span></div>
+                        <div class="app-grid">
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="app-name">Browser</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="app-name">Calendar</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="app-name">Maps</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><span class="app-name">Vault</span></div>
                         </div>
                     </div>
 
-                    <!-- Page 2: App Library -->
+                    <!-- Page 2: App Gallery -->
                     <div class="page">
-                        <div style="font-size:0.75rem; font-weight:600; color:var(--text-sub); margin-bottom:15px; letter-spacing:2px;">COLLECTION</div>
-                        <div class="app-cluster">
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">System</span></div>
+                        <div style="font-size:0.75rem; font-weight:600; color:var(--text-sub); margin-bottom:12px; letter-spacing:2px;">APP GALLERY</div>
+                        <div class="app-grid">
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">Settings</span></div>
                             <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><span class="app-name">Cloud</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><span class="app-name">Safe</span></div>
-                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="app-name">Battery</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="app-name">Power</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="app-name">Favs</span></div>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <!-- 動態分頁點 -->
             <div class="pagination-dots">
                 <div class="dot" id="dot0"></div>
                 <div class="dot active" id="dot1"></div>
                 <div class="dot" id="dot2"></div>
             </div>
 
-            <!-- 固定 Dock -->
-            <div class="dock-container">
-                <div class="dock">
-                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div></div>
-                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div></div>
-                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div></div>
-                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+            <!-- 動態膠囊擴展 DOCK -->
+            <div class="dock-wrapper">
+                <div class="fluid-dock">
+                    <div class="dock-app-list">
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Home Indicator -->
-            <div class="home-indicator"></div>
+            <!-- 可互動 APP 1: 音樂播放器 Modal -->
+            <div class="app-modal" id="modalMusic">
+                <div class="modal-header">
+                    <div class="modal-title">FRX Soundscape</div>
+                    <div class="close-btn" onclick="closeModal('modalMusic')">✕</div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                    <div style="width:180px; height:180px; border-radius:30px; background:linear-gradient(135deg, #ff758c, #ff7eb3); box-shadow:0 15px 35px rgba(255, 117, 140, 0.4); display:flex; justify-content:center; align-items:center; margin-bottom:30px;">
+                        <svg style="width:60px; stroke:#fff; fill:none; stroke-width:1.5;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <div style="font-size:1.3rem; font-weight:500;">Midnight City Ambient</div>
+                    <div style="font-size:0.85rem; color:var(--text-sub); margin-top:4px;">FRX Synthetic Audio</div>
+                    <button id="playBtn" style="margin-top:30px; padding:12px 36px; border-radius:25px; border:none; background:var(--accent-warm); color:#000; font-weight:600; cursor:pointer;">Pause</button>
+                </div>
+            </div>
+
+            <!-- 可互動 APP 2: 筆記 Modal -->
+            <div class="app-modal" id="modalNotes">
+                <div class="modal-header">
+                    <div class="modal-title">Quick Notes</div>
+                    <div class="close-btn" onclick="closeModal('modalNotes')">✕</div>
+                </div>
+                <textarea id="noteInput" style="width:100%; height:200px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); border-radius:18px; padding:15px; color:#fff; font-size:1rem; outline:none; resize:none;">Design is how it works.</textarea>
+                <button onclick="saveNote()" style="margin-top:15px; padding:12px; border-radius:18px; border:none; background:var(--accent-soft); color:#000; font-weight:600; cursor:pointer;">Save Note</button>
+            </div>
+
+            <!-- 可互動 APP 3: 天氣 Modal -->
+            <div class="app-modal" id="modalWeather">
+                <div class="modal-header">
+                    <div class="modal-title">Weather Live</div>
+                    <div class="close-btn" onclick="closeModal('modalWeather')">✕</div>
+                </div>
+                <div style="text-align:center; margin-top:20px;">
+                    <div style="font-size:3.5rem; font-weight:200;">24°C</div>
+                    <div style="font-size:1rem; color:var(--accent-mint); margin-top:5px;">Taoyuan City — Sunny</div>
+                    <div style="margin-top:30px; background:rgba(255,255,255,0.05); padding:15px; border-radius:20px; font-size:0.85rem; color:var(--text-sub);">
+                        Humidity: 65% | Wind: 12 km/h | UV: Moderate
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
 
-    <!-- 腳本控制 -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader');
@@ -512,7 +550,7 @@
                 loader.style.visibility = 'hidden';
                 phone.classList.add('active');
                 updatePagePosition();
-            }, 2000);
+            }, 1800);
 
             function updatePagePosition() {
                 currentTranslate = -currentPage * 33.3333;
@@ -581,12 +619,43 @@
             window.addEventListener('mousemove', touchMove);
             window.addEventListener('mouseup', touchEnd);
 
-            // App 保護點擊事件
-            document.querySelectorAll('.app-item').forEach(app => {
+            // APP 開啟 Modal 邏輯
+            const openModal = (id) => document.getElementById(id).classList.add('active');
+            window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+
+            document.getElementById('appMusic').onclick = () => openModal('modalMusic');
+            document.getElementById('widgetMusicCard').onclick = () => openModal('modalMusic');
+            document.getElementById('appNotes').onclick = () => openModal('modalNotes');
+            document.getElementById('widgetNoteCard').onclick = () => openModal('modalNotes');
+            document.getElementById('appWeather').onclick = () => openModal('modalWeather');
+            document.getElementById('widgetWeatherCard').onclick = () => openModal('modalWeather');
+
+            // 筆記儲存
+            window.saveNote = () => {
+                const text = document.getElementById('noteInput').value;
+                document.getElementById('notePreview').innerText = `"${text}"`;
+                closeModal('modalNotes');
+                showToast('Note Saved!');
+            };
+
+            // 播放按鈕
+            let isPlaying = true;
+            document.getElementById('playBtn').onclick = () => {
+                isPlaying = !isPlaying;
+                document.getElementById('playBtn').innerText = isPlaying ? 'Pause' : 'Play';
+            };
+
+            function showToast(msg) {
+                toast.innerText = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 1800);
+            }
+
+            // 一般 App 點擊保護
+            document.querySelectorAll('.app-item:not(#appMusic):not(#appNotes):not(#appWeather)').forEach(app => {
                 app.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 1800);
+                    showToast('FRX OS · App Preview');
                 });
             });
         });
