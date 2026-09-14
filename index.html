@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Nebula Core OS - Next-Gen Concept</title>
+    <title>FRX Neural OS - Next Gen Concept</title>
     <style>
         :root {
-            --bg-deep: #07080d;
-            --accent-glow: #7928CA;
-            --accent-cyan: #00DFD8;
-            --accent-gold: #FF0080;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --text-main: #FFFFFF;
-            --text-sub: rgba(255, 255, 255, 0.55);
+            --bg-deep: #0a0b10;
+            --accent-warm: #f6b179;
+            --accent-soft: #a0c4ff;
+            --accent-purple: #c77dff;
+            --glass-card: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.16);
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.6);
         }
 
         * {
@@ -22,11 +22,11 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Roboto, sans-serif;
         }
 
         body {
-            background-color: #030406;
+            background-color: #050608;
             color: var(--text-main);
             height: 100vh;
             overflow: hidden;
@@ -35,11 +35,11 @@
             align-items: center;
         }
 
-        /* 1. 開機動畫 */
+        /* 1. 經典啟動畫面 (回到原始質感風格) */
         #loader {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #05060a;
+            background: #0d0e15;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -48,42 +48,43 @@
             transition: opacity 0.8s ease, visibility 0.8s;
         }
 
-        .nebula-core {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--accent-glow), var(--accent-cyan));
-            box-shadow: 0 0 30px var(--accent-glow);
-            animation: pulseCore 1.5s infinite alternate ease-in-out;
-        }
-
-        @keyframes pulseCore {
-            0% { transform: scale(0.85); box-shadow: 0 0 15px var(--accent-glow); }
-            100% { transform: scale(1.15); box-shadow: 0 0 45px var(--accent-cyan); }
-        }
-
-        .loader-title {
-            margin-top: 25px;
-            font-size: 1.1rem;
-            letter-spacing: 6px;
+        .frx-logo {
+            font-size: 2.8rem;
             font-weight: 300;
-            background: linear-gradient(90deg, #fff, var(--accent-cyan));
+            letter-spacing: 8px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-warm));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        .loader-bar-container {
+            width: 130px; height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 25px;
+            overflow: hidden;
+        }
+
+        .loader-bar {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--accent-warm), var(--accent-soft));
+            animation: loadProgress 1.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
         /* 2. 手機機身容器 */
         .phone-container {
             width: 380px;
             height: 780px;
-            background: #0d0e15;
+            background: #111218;
             border-radius: 54px;
-            border: 3px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.9), 0 0 50px rgba(121, 40, 202, 0.15);
+            border: 4px solid #2b2d3d;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 45px rgba(246, 177, 121, 0.1);
             position: relative;
             overflow: hidden;
             opacity: 0;
-            transform: scale(0.95);
+            transform: scale(0.96);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
@@ -95,44 +96,59 @@
         .phone-screen {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 80% 20%, #1a102f 0%, #07080d 60%, #0a1118 100%);
+            background: linear-gradient(155deg, #12131C 0%, #1A1C2E 45%, #2A2538 80%, #182030 100%);
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
         }
 
-        /* 頂部狀態列 */
+        /* 動態流體光影背景 */
+        .ambient-blob {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(199, 125, 255, 0.25) 0%, rgba(0,0,0,0) 70%);
+            top: -50px;
+            right: -50px;
+            pointer-events: none;
+            animation: blobMove 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes blobMove {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, 80px) scale(1.2); }
+        }
+
+        /* 狀態列與動態島 */
         .status-bar {
             height: 44px;
-            padding: 0 26px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.8rem;
             font-weight: 500;
             z-index: 100;
-            letter-spacing: 1px;
-        }
-
-        /* 背景流體光暈 */
-        .ambient-glow {
-            position: absolute;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(121, 40, 202, 0.25) 0%, rgba(0,0,0,0) 70%);
-            top: 20%;
-            left: -10%;
             pointer-events: none;
-            animation: floatGlow 8s infinite alternate ease-in-out;
         }
 
-        @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 80px) scale(1.2); }
+        .dynamic-island {
+            width: 95px;
+            height: 22px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
         }
 
-        /* 多頁滑動區域 */
+        /* 滑動區域 */
         .viewport-wrapper {
             flex: 1;
             width: 100%;
@@ -153,352 +169,337 @@
         .page {
             width: 50%;
             height: 100%;
-            padding: 10px 22px 100px 22px;
             overflow-y: auto;
+            padding: 10px 20px 90px 20px;
             scrollbar-width: none;
         }
         .page::-webkit-scrollbar { display: none; }
 
-        /* 創新卡片 & 流線布局 */
-        .card-organic {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+        /* 🚀 創新排版 1：幾何異形主 Widget */
+        .hero-widget {
+            background: var(--glass-card);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border);
-            border-radius: 30px;
+            border-radius: 36px 16px 36px 36px;
             padding: 22px;
             margin-bottom: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 100%);
         }
 
-        .card-hero {
-            border-radius: 40px 18px 40px 40px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(121, 40, 202, 0.12) 100%);
+        .time-display {
+            font-size: 3.2rem;
+            font-weight: 200;
+            line-height: 1;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #ffffff, rgba(255,255,255,0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* 創新錯位 App 陣列 */
-        .organic-app-cluster {
+        /* 🚀 創新排版 2：非對稱多功能區塊 */
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .grid-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 26px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            justify-content: space-between;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .grid-card:active { transform: scale(0.93); }
+
+        /* 動態音波動畫 */
+        .wave-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 18px;
             margin-top: 10px;
         }
+        .wave-bar {
+            width: 3px;
+            background: var(--accent-warm);
+            border-radius: 3px;
+            animation: waveBounce 1.2s infinite ease-in-out alternate;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 70%; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 100%; }
+        .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 40%; }
 
-        .app-row {
-            display: flex;
-            gap: 14px;
-            justify-content: space-between;
+        @keyframes waveBounce {
+            0% { height: 20%; }
+            100% { height: 100%; }
         }
 
-        .app-item {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* 🚀 創新排版 3：流線型 App 橫欄 (Stream Rows) */
+        .app-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .app-stream-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
+            border-radius: 22px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
-            padding: 12px 16px;
-            gap: 12px;
+            justify-content: space-between;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            flex: 1;
+            transition: all 0.25s ease;
         }
 
-        .app-item:active {
-            transform: scale(0.92);
+        .app-stream-item:active {
+            transform: scale(0.95);
             background: rgba(255, 255, 255, 0.12);
         }
 
-        .app-item.square-style {
-            flex-direction: column;
-            justify-content: center;
-            padding: 18px 10px;
-            aspect-ratio: 1 / 1;
-            flex: unset;
-            width: 48%;
-        }
-
-        .app-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+        .app-left {
             display: flex;
-            justify-content: center;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.15);
+            gap: 14px;
         }
 
-        .app-icon-wrapper svg {
-            width: 20px;
-            height: 20px;
-            stroke: #ffffff;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .app-text-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-title { font-size: 0.85rem; font-weight: 500; }
-        .app-desc { font-size: 0.65rem; color: var(--text-sub); }
-
-        /* 🚀 創新核心：星體懸浮光環 DOCK (Orbital Core Dock) */
-        .orbital-dock-container {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* 展開的星體 App 軌道 */
-        .dock-orbit {
-            position: absolute;
-            width: 240px;
-            height: 70px;
-            background: rgba(18, 20, 32, 0.85);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 40px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 15px;
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.5);
-            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-        }
-
-        .orbital-dock-container.expanded .dock-orbit {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1) translateY(-60px);
-        }
-
-        .orbit-app {
+        .app-icon-box {
             width: 42px;
             height: 42px;
-            border-radius: 50%;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        .orbit-app:active { transform: scale(0.85); }
-
-        .orbit-app svg {
-            width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 1.8;
+        .app-icon-box svg {
+            width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 1.8;
+            stroke-linecap: round; stroke-linejoin: round;
         }
 
-        /* 中央懸浮星體主按鈕 */
-        .core-trigger {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-glow));
-            box-shadow: 0 0 25px rgba(0, 223, 216, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 201;
-            animation: orbFloat 3s infinite alternate ease-in-out;
-            transition: transform 0.3s ease;
-        }
-
-        .orbital-dock-container.expanded .core-trigger {
-            transform: rotate(45deg);
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-glow));
-            box-shadow: 0 0 25px rgba(255, 0, 128, 0.6);
-        }
-
-        @keyframes orbFloat {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-8px); }
-        }
-
-        /* 全域微光提示 Toast Modal */
-        .toast-dialog {
+        /* 🚀 創新 Dock：流體動態懸浮膠囊 (Fluid Floating Dock) */
+        .dock-wrapper {
             position: absolute;
-            top: 50%;
+            bottom: 22px;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(20, 22, 35, 0.9);
+            transform: translateX(-50%);
+            z-index: 90;
+            width: 88%;
+        }
+
+        .fluid-dock {
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(35px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 28px;
-            padding: 24px 30px;
+            -webkit-backdrop-filter: blur(35px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 35px;
+            padding: 10px 22px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            text-align: center;
-            z-index: 500;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            justify-content: space-between;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
         }
 
-        .toast-dialog.show {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .toast-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 0, 128, 0.15);
-            border: 1px solid var(--accent-gold);
+        .dock-icon {
+            width: 44px;
+            height: 44px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .toast-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
-        .toast-desc { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 18px; }
-
-        .toast-btn {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 24px;
-            border-radius: 16px;
-            color: #fff;
-            font-size: 0.8rem;
             cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 指示點 */
+        .dock-icon:active { transform: scale(0.8); }
+
+        .dock-icon svg {
+            width: 22px; height: 22px; stroke: #ffffff; fill: none; stroke-width: 1.8;
+        }
+
+        /* 分頁指示器 */
         .pagination-dots {
             position: absolute;
-            bottom: 12px;
+            bottom: 82px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 6px;
+            gap: 8px;
             z-index: 10;
         }
 
         .dot {
-            width: 5px; height: 5px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.35s ease;
         }
-        .dot.active { width: 14px; border-radius: 8px; background: var(--accent-cyan); }
+
+        .dot.active { width: 18px; border-radius: 10px; background: var(--accent-warm); }
+
+        /* 全域提示 Modal (暫時不支援預覽) */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            z-index: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            width: 260px;
+            background: rgba(30, 32, 48, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 28px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            transform: scale(0.85);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.show .modal-card { transform: scale(1); }
+
+        .modal-title { font-size: 1.05rem; font-weight: 500; margin-bottom: 6px; }
+        .modal-desc { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 20px; }
+
+        .modal-btn {
+            background: var(--accent-warm);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 開機動畫 -->
+    <!-- 1. 經典啟動畫面 -->
     <div id="loader">
-        <div class="nebula-core"></div>
-        <div class="loader-title">NEBULA CORE</div>
+        <div class="frx-logo">FRX OS</div>
+        <div class="loader-bar-container"><div class="loader-bar"></div></div>
     </div>
 
-    <!-- 手機容器 -->
+    <!-- 2. 手機容器 -->
     <div class="phone-container" id="phone">
         <div class="phone-screen">
             
-            <div class="ambient-glow"></div>
+            <div class="ambient-blob"></div>
 
             <div class="status-bar">
                 <span>09:41</span>
-                <span style="letter-spacing: 2px;">NEBULA OS</span>
+                <span style="font-size:0.75rem;">5G ●</span>
             </div>
+            <div class="dynamic-island"></div>
 
             <!-- 主畫面視圖 -->
             <div class="viewport-wrapper" id="viewportWrapper">
                 <div class="pages-viewport" id="viewport">
                     
-                    <!-- 主頁 1：流體核心空間 -->
+                    <!-- Page 0: 流體主頁 -->
                     <div class="page">
-                        <div class="card-organic card-hero">
-                            <div style="font-size: 0.65rem; letter-spacing: 3px; color: var(--accent-cyan); font-weight:600;">SYSTEM MATRIX</div>
-                            <div style="font-size: 2.8rem; font-weight: 200; margin: 4px 0;">09:41</div>
-                            <div style="font-size: 0.75rem; color: var(--text-sub);">MON, SEP 14 — NEBULA FLOW</div>
+                        <!-- 主視訊模組 -->
+                        <div class="hero-widget">
+                            <div style="font-size: 0.68rem; letter-spacing: 2px; color: var(--accent-warm); font-weight:600;">NEURAL MATRIX</div>
+                            <div class="time-display">09:41</div>
+                            <div style="font-size: 0.78rem; color: var(--text-sub); margin-top: 4px;">MON, SEP 14 — TAOYUAN</div>
                         </div>
 
-                        <div class="organic-app-cluster">
-                            <!-- 橫向雙 App 排版 -->
-                            <div class="app-row">
-                                <div class="app-item clickable-app">
-                                    <div class="app-icon-wrapper">
-                                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                    </div>
-                                    <div class="app-text-group">
-                                        <span class="app-title">Finance</span>
-                                        <span class="app-desc">Vault Core</span>
-                                    </div>
+                        <!-- 非對稱雙 Widget 展示 -->
+                        <div class="asymmetric-grid">
+                            <div class="grid-card app-trigger">
+                                <div>
+                                    <div style="font-size:0.65rem; color:var(--accent-soft);">NOW PLAYING</div>
+                                    <div style="font-size:0.85rem; font-weight:500; margin-top:4px;">Cyber Flow</div>
                                 </div>
-                                <div class="app-item clickable-app">
-                                    <div class="app-icon-wrapper">
-                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                                    </div>
-                                    <div class="app-text-group">
-                                        <span class="app-title">Browser</span>
-                                        <span class="app-desc">Quantum</span>
-                                    </div>
+                                <div class="wave-container">
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
+                                    <div class="wave-bar"></div>
                                 </div>
                             </div>
 
-                            <!-- 正方形特化 App 排版 -->
-                            <div class="app-row">
-                                <div class="app-item square-style clickable-app">
-                                    <div class="app-icon-wrapper" style="margin-bottom:8px;">
-                                        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                    </div>
-                                    <span class="app-title">Messages</span>
-                                    <span class="app-desc">Encrypted</span>
+                            <div class="grid-card app-trigger">
+                                <div style="font-size:0.65rem; color:var(--accent-purple);">ATMOSPHERE</div>
+                                <div style="font-size:1.4rem; font-weight:200; margin-top:6px;">24°C</div>
+                                <div style="font-size:0.65rem; color:var(--text-sub);">Clear Sky</div>
+                            </div>
+                        </div>
+
+                        <!-- 流線型 App 列表 -->
+                        <div class="app-stream">
+                            <div class="app-stream-item app-trigger">
+                                <div class="app-left">
+                                    <div class="app-icon-box"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                                    <div><div style="font-size:0.88rem; font-weight:500;">Neural Chat</div><div style="font-size:0.68rem; color:var(--text-sub);">3 new signals</div></div>
                                 </div>
-                                <div class="app-item square-style clickable-app">
-                                    <div class="app-icon-wrapper" style="margin-bottom:8px;">
-                                        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                    </div>
-                                    <span class="app-title">Optics</span>
-                                    <span class="app-desc">Camera AI</span>
+                                <span style="font-size:0.7rem; color:var(--accent-soft);">→</span>
+                            </div>
+
+                            <div class="app-stream-item app-trigger">
+                                <div class="app-left">
+                                    <div class="app-icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                                    <div><div style="font-size:0.88rem; font-weight:500;">Quantum Browser</div><div style="font-size:0.68rem; color:var(--text-sub);">Encrypted</div></div>
                                 </div>
+                                <span style="font-size:0.7rem; color:var(--accent-soft);">→</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 主頁 2：星雲延伸組件 -->
+                    <!-- Page 1: 幾何擴展頁 -->
                     <div class="page">
-                        <div class="card-organic">
-                            <div style="font-size: 0.65rem; letter-spacing: 2px; color: var(--accent-gold); font-weight:600;">NEBULA AUDIO</div>
-                            <div style="font-size: 1rem; margin-top:6px; font-weight:300;">Cybernetic Echoes</div>
-                            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top:2px;">Spatial Sound Engine</div>
-                        </div>
+                        <div style="font-size:0.72rem; font-weight:600; color:var(--accent-soft); letter-spacing:2px; margin-bottom:14px;">EXTENDED CORE</div>
+                        
+                        <div class="app-stream">
+                            <div class="app-stream-item app-trigger">
+                                <div class="app-left">
+                                    <div class="app-icon-box"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                                    <div><div style="font-size:0.88rem; font-weight:500;">Calendar & Events</div><div style="font-size:0.68rem; color:var(--text-sub);">2 events today</div></div>
+                                </div>
+                            </div>
 
-                        <div class="organic-app-cluster">
-                            <div class="app-item clickable-app">
-                                <div class="app-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/><circle cx="12" cy="12" r="5"/></svg></div>
-                                <div class="app-text-group"><span class="app-title">Atmosphere</span><span class="app-desc">Weather Pulse</span></div>
+                            <div class="app-stream-item app-trigger">
+                                <div class="app-left">
+                                    <div class="app-icon-box"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                                    <div><div style="font-size:0.88rem; font-weight:500;">Optics Camera</div><div style="font-size:0.68rem; color:var(--text-sub);">Spatial Capture</div></div>
+                                </div>
                             </div>
-                            <div class="app-item clickable-app">
-                                <div class="app-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                                <div class="app-text-group"><span class="app-title">Documents</span><span class="app-desc">Neural Drive</span></div>
-                            </div>
-                            <div class="app-item clickable-app">
-                                <div class="app-icon-wrapper"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-                                <div class="app-text-group"><span class="app-title">Settings</span><span class="app-desc">Core Control</span></div>
+
+                            <div class="app-stream-item app-trigger">
+                                <div class="app-left">
+                                    <div class="app-icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                                    <div><div style="font-size:0.88rem; font-weight:500;">System Control</div><div style="font-size:0.68rem; color:var(--text-sub);">Neural Config</div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -506,35 +507,28 @@
                 </div>
             </div>
 
-            <!-- 分頁指示器 -->
             <div class="pagination-dots">
                 <div class="dot active" id="dot0"></div>
                 <div class="dot" id="dot1"></div>
             </div>
 
-            <!-- 🚀 創新星體懸浮光環 DOCK -->
-            <div class="orbital-dock-container" id="orbitalDock">
-                <div class="dock-orbit">
-                    <div class="orbit-app clickable-app"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-                    <div class="orbit-app clickable-app"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-                    <div class="orbit-app clickable-app"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/></svg></div>
-                    <div class="orbit-app clickable-app"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-                </div>
-                
-                <!-- 中央動態觸控星體 -->
-                <div class="core-trigger" id="coreBtn">
-                    <svg style="width:26px; height:26px; stroke:#fff; fill:none; stroke-width:2;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <!-- 動態膠囊 DOCK -->
+            <div class="dock-wrapper">
+                <div class="fluid-dock">
+                    <div class="dock-icon app-trigger"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+                    <div class="dock-icon app-trigger"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                    <div class="dock-icon app-trigger"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                    <div class="dock-icon app-trigger"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                 </div>
             </div>
 
-            <!-- 全域預覽提示 MODAL -->
-            <div class="toast-dialog" id="toastModal">
-                <div class="toast-icon">
-                    <svg style="width:24px; height:24px; stroke:var(--accent-gold); fill:none; stroke-width:2;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <!-- 彈窗 Modal (暫時不支援預覽) -->
+            <div class="modal-overlay" id="modal">
+                <div class="modal-card">
+                    <div class="modal-title">FRX Neural OS</div>
+                    <div class="modal-desc">暫時不支援預覽</div>
+                    <button class="modal-btn" onclick="closeModal()">確定</button>
                 </div>
-                <div class="toast-title">Nebula Core OS</div>
-                <div class="toast-desc">暫時不支援預覽</div>
-                <div class="toast-btn" onclick="closeToast()">確認</div>
             </div>
 
         </div>
@@ -546,9 +540,7 @@
             const phone = document.getElementById('phone');
             const viewport = document.getElementById('viewport');
             const wrapper = document.getElementById('viewportWrapper');
-            const orbitalDock = document.getElementById('orbitalDock');
-            const coreBtn = document.getElementById('coreBtn');
-            const toastModal = document.getElementById('toastModal');
+            const modal = document.getElementById('modal');
 
             let currentPage = 0;
             let startX = 0, startY = 0;
@@ -557,23 +549,12 @@
             let isDragging = false;
             let isHorizontalSwipe = false;
 
-            // 開機動畫淡出
+            // 開機動畫淡出並滑入主畫面
             setTimeout(() => {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
                 phone.classList.add('active');
-            }, 1500);
-
-            // 星體 Dock 展開/收合
-            coreBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                orbitalDock.classList.toggle('expanded');
-            });
-
-            // 點擊其他地方收合 Dock
-            document.addEventListener('click', () => {
-                orbitalDock.classList.remove('expanded');
-            });
+            }, 1800);
 
             // 分頁切換邏輯
             function updatePagePosition() {
@@ -643,16 +624,16 @@
             window.addEventListener('mousemove', touchMove);
             window.addEventListener('mouseup', touchEnd);
 
-            // 點擊 App 顯示「暫時不支援預覽」
-            document.querySelectorAll('.clickable-app').forEach(app => {
-                app.addEventListener('click', (e) => {
+            // App 點擊邏輯
+            document.querySelectorAll('.app-trigger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    toastModal.classList.add('show');
+                    modal.classList.add('show');
                 });
             });
 
-            window.closeToast = () => {
-                toastModal.classList.remove('show');
+            window.closeModal = () => {
+                modal.classList.remove('show');
             };
         });
     </script>
