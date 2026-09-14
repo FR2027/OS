@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRX OS - Next-Gen UI Concept Showcase</title>
+    <style>
+        /* ==================== 全局樣式設定 ==================== */
+        :root {
+            --bg-color: #080B10;
+            --neon-cyan: #00f3ff;
+            --neon-glow: rgba(0, 243, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* 全局禁止選取，強化 App 外觀感 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==================== 1. 加載頁面 (Loading Screen) ==================== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.2s;
+        }
+
+        .frx-logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan),
+                0 0 40px var(--neon-cyan);
+            animation: neonPulse 2s infinite alternate ease-in-out;
+        }
+
+        .loader-bar-container {
+            width: 160px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .loader-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+            animation: loadProgress 2.5s forwards cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        @keyframes neonPulse {
+            0% { opacity: 0.7; text-shadow: 0 0 8px var(--neon-cyan); }
+            100% { opacity: 1; text-shadow: 0 0 25px var(--neon-cyan), 0 0 45px var(--neon-cyan); }
+        }
+
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ==================== 2. 手機模型外框 (Phone Mockup) ==================== */
+        .stage {
+            perspective: 1000px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        .stage.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .phone-frame {
+            width: 360px;
+            height: 740px;
+            background: #000;
+            border-radius: 50px;
+            border: 4px solid #1a222d;
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(0, 243, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* 手機桌布背景 (流體動態感) */
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 20%, rgba(0, 243, 255, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 20% 80%, rgba(0, 102, 255, 0.2) 0%, transparent 50%),
+                        #05080e;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 頂部動態島 / 狀態列 */
+        .status-bar {
+            height: 40px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* ==================== 3. 主畫面可滑動內容區 ==================== */
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px 30px 20px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .scrollable-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        /* 大型時間與系統頭條 Widget */
+        .widget-clock {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .widget-clock .os-title {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .widget-clock .time {
+            font-size: 2.8rem;
+            font-weight: 200;
+            letter-spacing: -1px;
+        }
+
+        .widget-clock .date {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        /* 全白 App 網格布局 */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px 12px;
+            margin-bottom: 25px;
+        }
+
+        /* App 項目 (純展示外觀，不可點擊) */
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: default; /* 鼠標顯示預設，強調僅展示 */
+        }
+
+        .app-icon {
+            width: 58px;
+            height: 58px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px; /* iOS Squircle 風格 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 經典頂部高光塗層 */
+        .app-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        /* 全白向量 Icon 樣式 */
+        .app-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .app-name {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* 橫向微型資訊面板 Widget */
+        .widget-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 15px 18px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .widget-banner-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .widget-banner-info svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--neon-cyan);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .widget-banner-text {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 底部固定 Dock 欄 */
+        .dock-container {
+            padding: 0 20px 20px 20px;
+        }
+
+        .dock {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 30px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dock .app-icon {
+            margin-bottom: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 加載頁面 -->
+    <div id="loader">
+        <div class="frx-logo">FRX OS</div>
+        <div class="loader-bar-container">
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- 2. 展示主舞台 -->
+    <div class="stage" id="stage">
+        <div class="phone-frame" id="phoneFrame">
+            <div class="phone-screen">
+                
+                <!-- 狀態列 -->
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>5G ●</span>
+                </div>
+
+                <!-- 可滑動展示內容區 -->
+                <div class="scrollable-content">
+                    
+                    <!-- 時鐘與系統資訊 Widget -->
+                    <div class="widget-clock">
+                        <div class="os-title">FRX OS CONCEPT</div>
+                        <div class="time">09:41</div>
+                        <div class="date">MON, SEP 14 — NEXT GEN DESIGN</div>
+                    </div>
+
+                    <!-- 全白 App 網格 第一區 -->
+                    <div class="app-grid">
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <span class="app-name">Phone</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <span class="app-name">Message</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            </div>
+                            <span class="app-name">Browser</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </div>
+                            <span class="app-name">Camera</span>
+                        </div>
+                    </div>
+
+                    <!-- 第二區 App 排版 -->
+                    <div class="app-grid">
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </div>
+                            <span class="app-name">Favorites</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                            </div>
+                            <span class="app-name">Music</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </div>
+                            <span class="app-name">Calendar</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                            <span class="app-name">Maps</span>
+                        </div>
+                    </div>
+
+                    <!-- 系統動態條 Widget -->
+                    <div class="widget-banner">
+                        <div class="widget-banner-info">
+                            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            <span class="widget-banner-text">FRX Neural Engine Active</span>
+                        </div>
+                    </div>
+
+                    <!-- 第三區 App 排版 (測試可滑動) -->
+                    <div class="app-grid">
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            </div>
+                            <span class="app-name">Settings</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                            </div>
+                            <span class="app-name">Cloud</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                            </div>
+                            <span class="app-name">Vault</span>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">
+                                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            </div>
+                            <span class="app-name">Power</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 底部 Dock 欄 (固定位置) -->
+                <div class="dock-container">
+                    <div class="dock">
+                        <div class="app-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        </div>
+                        <div class="app-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                        <div class="app-icon">
+                            <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                        </div>
+                        <div class="app-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 腳本控制：加載頁計時器與 3D 視差效果 -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader');
+            const stage = document.getElementById('stage');
+            const phoneFrame = document.getElementById('phoneFrame');
+
+            // 1. 加載動畫完成後淡出並顯示主畫面 (2.5秒)
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                stage.classList.add('visible');
+            }, 2500);
+
+            // 2. 鼠標懸浮 3D 視差傾斜效果 (增強網站展示高級感)
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                phoneFrame.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>
