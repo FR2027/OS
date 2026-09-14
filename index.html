@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>FRX OS - Phone System Simulator</title>
     <style>
         :root {
@@ -111,7 +111,7 @@
             position: relative;
         }
 
-        /* ==================== 頂部狀態列與動態島 ==================== */
+        /* 頂部狀態列 & 動態島 */
         .status-bar {
             height: 44px;
             padding: 0 24px;
@@ -122,6 +122,7 @@
             font-weight: 600;
             color: rgba(255, 255, 255, 0.85);
             z-index: 100;
+            pointer-events: none;
         }
 
         .dynamic-island {
@@ -136,30 +137,49 @@
             z-index: 101;
             border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            pointer-events: none;
         }
 
-        /* ==================== 橫向滑動分頁核心 (Swiper View) ==================== */
-        .pages-viewport {
+        /* ==================== 橫向滑動視圖容器 ==================== */
+        .viewport-wrapper {
             flex: 1;
-            display: flex;
-            width: 300%; /* 3 個分頁 */
-            height: 100%;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+            overflow: hidden;
+            position: relative;
         }
 
+        .pages-viewport {
+            display: flex;
+            width: 300%; /* 3個分頁：0=Widget, 1=Home, 2=Library */
+            height: 100%;
+            will-change: transform;
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .pages-viewport.dragging {
+            transition: none; /* 拖拽時取消動畫，確保跟手感 */
+        }
+
+        /* 個別分頁與縱向滾動 */
         .page {
-            width: 33.333%;
+            width: 33.3333%;
             height: 100%;
             overflow-y: auto;
             padding: 10px 22px 20px 22px;
-            scrollbar-width: none;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
 
         .page::-webkit-scrollbar {
-            display: none;
+            width: 3px;
         }
 
-        /* ==================== iOS 風格組件 (Widgets & Apps) ==================== */
+        .page::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* ==================== UI 卡片與 App 圖示排版 ==================== */
         .widget-card {
             background: var(--glass-bg);
             backdrop-filter: blur(25px);
@@ -192,7 +212,6 @@
             margin-top: 6px;
         }
 
-        /* App 網格佈局 */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -219,7 +238,7 @@
             border: 1px solid rgba(255, 255, 255, 0.14);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-radius: 17px; /* iOS Squircle */
+            border-radius: 17px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -245,9 +264,9 @@
             font-weight: 400;
         }
 
-        /* 分頁指示器 (Pagination Dots) */
+        /* 分頁指示器 (iOS Dynamic Dots) */
         .pagination-dots {
-            height: 18px;
+            height: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -260,7 +279,7 @@
             height: 7px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.25);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .dot.active {
@@ -299,7 +318,7 @@
             box-shadow: none;
         }
 
-        /* iOS 指示條 (Home Indicator Bar) */
+        /* iOS 指示條 (Home Indicator) */
         .home-indicator {
             width: 130px;
             height: 4px;
@@ -308,7 +327,7 @@
             margin: 4px auto 6px auto;
         }
 
-        /* App 禁用彈窗提示 (Preview Only Toast) */
+        /* App 禁用彈窗提示 (Preview Toast) */
         .toast-notification {
             position: absolute;
             top: 55px;
@@ -336,7 +355,7 @@
 </head>
 <body>
 
-    <!-- 1. 全黑加載頁面 -->
+    <!-- 1. 加載頁面 -->
     <div id="loader">
         <div class="frx-logo">FRX OS</div>
         <div class="loader-bar-container">
@@ -348,75 +367,80 @@
     <div class="phone-container" id="phone">
         <div class="phone-screen">
             
-            <!-- 頂部狀態列 & 動態島 -->
+            <!-- 狀態列 & 動態島 -->
             <div class="status-bar">
-                <span id="currentTime">09:41</span>
+                <span>09:41</span>
                 <span>5G ●</span>
             </div>
             <div class="dynamic-island"></div>
 
-            <!-- 系統微光提示彈窗 (App 禁用告知) -->
+            <!-- Toast 系統提示 -->
             <div class="toast-notification" id="toast">FRX OS Preview Mode (Apps Inactive)</div>
 
-            <!-- 可滑動分頁區塊 (Swiper Viewport) -->
-            <div class="pages-viewport" id="viewport">
-                
-                <!-- Page 1: Widget Center -->
-                <div class="page">
-                    <div class="widget-card">
-                        <div style="font-size: 0.75rem; color: var(--neon-cyan); font-weight:700;">SYSTEM MONITOR</div>
-                        <div style="font-size: 1.4rem; font-weight: 300; margin-top:5px;">Neural Core: 98%</div>
-                        <div style="font-size: 0.75rem; color: var(--text-sub); margin-top:4px;">Quantum Storage: 1.2 TB Free</div>
-                    </div>
-                    <div class="widget-card">
-                        <div style="font-size: 0.75rem; color: #fff; font-weight:600; margin-bottom:8px;">QUICK MEDIA</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:0.8rem; color: var(--text-sub);">Now Playing — FRX Ambient</span>
-                            <svg style="width:20px; stroke:#00f3ff; fill:none; stroke-width:2;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <!-- 橫向滑動視圖區塊 -->
+            <div class="viewport-wrapper" id="viewportWrapper">
+                <div class="pages-viewport" id="viewport">
+                    
+                    <!-- Page 0: 小工具頁面 (Widget Center) -->
+                    <div class="page">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub); margin-bottom:15px; letter-spacing:1px;">WIDGET CENTER</div>
+                        <div class="widget-card">
+                            <div style="font-size: 0.75rem; color: var(--neon-cyan); font-weight:700;">SYSTEM MONITOR</div>
+                            <div style="font-size: 1.4rem; font-weight: 300; margin-top:5px;">Neural Core: 98%</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top:4px;">Quantum Storage: 1.2 TB Free</div>
+                        </div>
+                        <div class="widget-card">
+                            <div style="font-size: 0.75rem; color: #fff; font-weight:600; margin-bottom:8px;">QUICK MEDIA</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.8rem; color: var(--text-sub);">Now Playing — FRX Ambient</span>
+                                <svg style="width:20px; stroke:#00f3ff; fill:none; stroke-width:2;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                        </div>
+                        <div class="widget-card">
+                            <div style="font-size: 0.75rem; color: var(--text-sub); font-weight:600; margin-bottom:4px;">WEATHER</div>
+                            <div style="font-size: 1.8rem; font-weight: 200;">24°C Sunny</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top:4px;">Taoyuan City, Taiwan</div>
                         </div>
                     </div>
+
+                    <!-- Page 1: 主頁 (Main Home Screen - 預設顯示) -->
+                    <div class="page">
+                        <div class="widget-card clock-widget">
+                            <div class="brand-title">FRX OS SYSTEM</div>
+                            <div class="time">09:41</div>
+                            <div class="date">MON, SEP 14 — PURE VISION</div>
+                        </div>
+
+                        <div class="app-grid">
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><span class="app-name">Phone</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="app-name">Message</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="app-name">Browser</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="app-name">Camera</span></div>
+                        </div>
+
+                        <div class="app-grid">
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="app-name">Favorites</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="app-name">Music</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="app-name">Calendar</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="app-name">Maps</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Page 2: App 資源庫 (App Library) -->
+                    <div class="page">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub); margin-bottom:15px; letter-spacing:1px;">APP LIBRARY</div>
+                        <div class="app-grid">
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">Settings</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><span class="app-name">Cloud</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><span class="app-name">Vault</span></div>
+                            <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="app-name">Power</span></div>
+                        </div>
+                    </div>
+
                 </div>
-
-                <!-- Page 2: Main Home Screen (預設主頁) -->
-                <div class="page">
-                    <!-- 時鐘與品牌頭條 Widget -->
-                    <div class="widget-card clock-widget">
-                        <div class="brand-title">FRX OS SYSTEM</div>
-                        <div class="time">09:41</div>
-                        <div class="date">MON, SEP 14 — PURE VISION</div>
-                    </div>
-
-                    <!-- App 網格 Row 1 -->
-                    <div class="app-grid">
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><span class="app-name">Phone</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="app-name">Message</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="app-name">Browser</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="app-name">Camera</span></div>
-                    </div>
-
-                    <!-- App 網格 Row 2 -->
-                    <div class="app-grid">
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="app-name">Favorites</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="app-name">Music</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="app-name">Calendar</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="app-name">Maps</span></div>
-                    </div>
-                </div>
-
-                <!-- Page 3: App Library -->
-                <div class="page">
-                    <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub); margin-bottom:15px; letter-spacing:1px;">APP LIBRARY</div>
-                    <div class="app-grid">
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">Settings</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><span class="app-name">Cloud</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><span class="app-name">Vault</span></div>
-                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="app-name">Power</span></div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- 分頁指示器 (Dots) -->
+            <!-- 動態分頁點 (Pagination Dots) -->
             <div class="pagination-dots">
                 <div class="dot" id="dot0"></div>
                 <div class="dot active" id="dot1"></div>
@@ -433,59 +457,110 @@
                 </div>
             </div>
 
-            <!-- Home Indicator 條 -->
+            <!-- Home Indicator -->
             <div class="home-indicator"></div>
 
         </div>
     </div>
 
-    <!-- 邏輯控制腳本 -->
+    <!-- 滑動手勢與切換邏輯 -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader');
             const phone = document.getElementById('phone');
             const viewport = document.getElementById('viewport');
+            const wrapper = document.getElementById('viewportWrapper');
             const toast = document.getElementById('toast');
 
-            let currentPage = 1; // 預設主頁 (index 1)
-            let startX = 0;
-            let isSwiping = false;
+            let currentPage = 1; // 預設主頁
+            let startX = 0, startY = 0;
+            let currentTranslate = -33.3333;
+            let prevTranslate = -33.3333;
+            let isDragging = false;
+            let isHorizontalSwipe = false;
 
-            // 1. 加載動畫過渡
+            // 1. 加載頁面過渡動畫
             setTimeout(() => {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
                 phone.classList.add('active');
                 updatePagePosition();
-            }, 2300);
+            }, 2200);
 
-            // 2. 切換分頁邏輯
+            // 2. 更新畫面位置與 iOS 指示點
             function updatePagePosition() {
-                viewport.style.transform = `translateX(-${currentPage * 33.333}%)`;
+                currentTranslate = -currentPage * 33.3333;
+                prevTranslate = currentTranslate;
+                viewport.style.transform = `translateX(${currentTranslate}%)`;
+                
                 document.querySelectorAll('.dot').forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentPage);
                 });
             }
 
-            // 3. 觸控 / 滑鼠拖曳橫向切換分頁 (Swipe)
-            viewport.addEventListener('mousedown', (e) => {
-                startX = e.clientX;
-                isSwiping = true;
-            });
+            // 3. 多軸手勢識別 (區分橫向 Swipe 與縱向 Scroll)
+            function touchStart(e) {
+                const touch = e.type.includes('touch') ? e.touches[0] : e;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                isDragging = true;
+                isHorizontalSwipe = false;
+                viewport.classList.add('dragging');
+            }
 
-            viewport.addEventListener('mouseup', (e) => {
-                if (!isSwiping) return;
-                const diffX = startX - e.clientX;
-                if (diffX > 50 && currentPage < 2) {
-                    currentPage++;
-                } else if (diffX < -50 && currentPage > 0) {
-                    currentPage--;
+            function touchMove(e) {
+                if (!isDragging) return;
+                const touch = e.type.includes('touch') ? e.touches[0] : e;
+                const deltaX = touch.clientX - startX;
+                const deltaY = touch.clientY - startY;
+
+                // 第一步：判定滑動方向
+                if (!isHorizontalSwipe) {
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+                        isHorizontalSwipe = true; // 確立為橫向滑動
+                    } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                        return; // 縱向滾動交給 CSS 原生 overflow-y 處理
+                    }
+                }
+
+                // 橫向滑動時阻止頁面滾動預設動作
+                if (isHorizontalSwipe) {
+                    if (e.cancelable) e.preventDefault();
+                    const containerWidth = wrapper.clientWidth;
+                    const dragPercent = (deltaX / containerWidth) * 33.3333;
+                    viewport.style.transform = `translateX(${prevTranslate + dragPercent}%)`;
+                }
+            }
+
+            function touchEnd(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                viewport.classList.remove('dragging');
+
+                if (isHorizontalSwipe) {
+                    const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+                    const diffX = startX - endX;
+
+                    // 閥值判定切換
+                    if (diffX > 40 && currentPage < 2) {
+                        currentPage++;
+                    } else if (diffX < -40 && currentPage > 0) {
+                        currentPage--;
+                    }
                 }
                 updatePagePosition();
-                isSwiping = false;
-            });
+            }
 
-            // 4. App 點擊保護與微光 Toast 提示
+            // 綁定 Event Listeners
+            wrapper.addEventListener('touchstart', touchStart, { passive: true });
+            wrapper.addEventListener('touchmove', touchMove, { passive: false });
+            wrapper.addEventListener('touchend', touchEnd);
+
+            wrapper.addEventListener('mousedown', touchStart);
+            window.addEventListener('mousemove', touchMove);
+            window.addEventListener('mouseup', touchEnd);
+
+            // 4. App 點擊保護與提示
             document.querySelectorAll('.app-item').forEach(app => {
                 app.addEventListener('click', (e) => {
                     e.stopPropagation();
