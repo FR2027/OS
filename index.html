@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRX OS - Next-Gen UI Concept Showcase</title>
+    <title>FRX OS - Phone System Simulator</title>
     <style>
-        /* ==================== 全局樣式設定 ==================== */
         :root {
-            --bg-color: #080B10;
+            --bg-color: #06080d;
             --neon-cyan: #00f3ff;
-            --neon-glow: rgba(0, 243, 255, 0.4);
-            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.06);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --text-color: #ffffff;
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.6);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none; /* 全局禁止選取，強化 App 外觀感 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -33,20 +33,17 @@
             align-items: center;
         }
 
-        /* ==================== 1. 加載頁面 (Loading Screen) ==================== */
+        /* ==================== 1. 加載動畫頁面 ==================== */
         #loader {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.2s;
+            transition: opacity 1.2s ease, visibility 1.2s;
         }
 
         .frx-logo {
@@ -54,33 +51,28 @@
             font-weight: 700;
             letter-spacing: 6px;
             color: #fff;
-            text-shadow: 
-                0 0 10px var(--neon-cyan),
-                0 0 20px var(--neon-cyan),
-                0 0 40px var(--neon-cyan);
-            animation: neonPulse 2s infinite alternate ease-in-out;
+            text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+            animation: pulseGlow 2s infinite alternate ease-in-out;
         }
 
         .loader-bar-container {
-            width: 160px;
-            height: 3px;
+            width: 140px; height: 3px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            margin-top: 30px;
+            margin-top: 25px;
             overflow: hidden;
         }
 
         .loader-bar {
-            width: 0%;
-            height: 100%;
+            width: 0%; height: 100%;
             background: var(--neon-cyan);
             box-shadow: 0 0 10px var(--neon-cyan);
-            animation: loadProgress 2.5s forwards cubic-bezier(0.65, 0, 0.35, 1);
+            animation: loadProgress 2.2s forwards cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        @keyframes neonPulse {
-            0% { opacity: 0.7; text-shadow: 0 0 8px var(--neon-cyan); }
-            100% { opacity: 1; text-shadow: 0 0 25px var(--neon-cyan), 0 0 45px var(--neon-cyan); }
+        @keyframes pulseGlow {
+            0% { opacity: 0.7; text-shadow: 0 0 10px var(--neon-cyan); }
+            100% { opacity: 1; text-shadow: 0 0 30px var(--neon-cyan), 0 0 50px var(--neon-cyan); }
         }
 
         @keyframes loadProgress {
@@ -88,152 +80,154 @@
             100% { width: 100%; }
         }
 
-        /* ==================== 2. 手機模型外框 (Phone Mockup) ==================== */
-        .stage {
-            perspective: 1000px;
+        /* ==================== 2. 手機機身容器 ==================== */
+        .phone-container {
+            width: 380px;
+            height: 780px;
+            background: #000;
+            border-radius: 54px;
+            border: 4px solid #1f2833;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 243, 255, 0.12);
+            position: relative;
+            overflow: hidden;
             opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 1.5s ease, transform 1.5s ease;
+            transform: scale(0.96);
+            transition: opacity 1s ease, transform 1s ease;
         }
 
-        .stage.visible {
+        .phone-container.active {
             opacity: 1;
             transform: scale(1);
         }
 
-        .phone-frame {
-            width: 360px;
-            height: 740px;
-            background: #000;
-            border-radius: 50px;
-            border: 4px solid #1a222d;
-            box-shadow: 
-                0 25px 60px rgba(0, 0, 0, 0.8),
-                0 0 40px rgba(0, 243, 255, 0.15);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.1s ease-out;
-        }
-
-        /* 手機桌布背景 (流體動態感) */
         .phone-screen {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 80% 20%, rgba(0, 243, 255, 0.15) 0%, transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(0, 102, 255, 0.2) 0%, transparent 50%),
-                        #05080e;
+            background: radial-gradient(circle at 80% 15%, rgba(0, 243, 255, 0.12) 0%, transparent 40%),
+                        radial-gradient(circle at 10% 85%, rgba(0, 80, 255, 0.15) 0%, transparent 50%),
+                        #05070c;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* 頂部動態島 / 狀態列 */
+        /* ==================== 頂部狀態列與動態島 ==================== */
         .status-bar {
-            height: 40px;
+            height: 44px;
             padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.8rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            z-index: 10;
+            color: rgba(255, 255, 255, 0.85);
+            z-index: 100;
         }
 
-        /* ==================== 3. 主畫面可滑動內容區 ==================== */
-        .scrollable-content {
+        .dynamic-island {
+            width: 105px;
+            height: 24px;
+            background: #000;
+            border-radius: 20px;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        /* ==================== 橫向滑動分頁核心 (Swiper View) ==================== */
+        .pages-viewport {
             flex: 1;
+            display: flex;
+            width: 300%; /* 3 個分頁 */
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .page {
+            width: 33.333%;
+            height: 100%;
             overflow-y: auto;
-            padding: 10px 20px 30px 20px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            padding: 10px 22px 20px 22px;
+            scrollbar-width: none;
         }
 
-        .scrollable-content::-webkit-scrollbar {
-            width: 4px;
-        }
-        .scrollable-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
+        .page::-webkit-scrollbar {
+            display: none;
         }
 
-        /* 大型時間與系統頭條 Widget */
-        .widget-clock {
+        /* ==================== iOS 風格組件 (Widgets & Apps) ==================== */
+        .widget-card {
             background: var(--glass-bg);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
             border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            padding: 18px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .widget-clock .os-title {
-            font-size: 0.75rem;
+        .clock-widget .brand-title {
+            font-size: 0.7rem;
+            font-weight: 800;
             letter-spacing: 2px;
             color: var(--neon-cyan);
-            margin-bottom: 5px;
-            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .widget-clock .time {
+        .clock-widget .time {
             font-size: 2.8rem;
             font-weight: 200;
             letter-spacing: -1px;
+            line-height: 1;
         }
 
-        .widget-clock .date {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 2px;
+        .clock-widget .date {
+            font-size: 0.82rem;
+            color: var(--text-sub);
+            margin-top: 6px;
         }
 
-        /* 全白 App 網格布局 */
+        /* App 網格佈局 */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 18px 12px;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
         }
 
-        /* App 項目 (純展示外觀，不可點擊) */
         .app-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: default; /* 鼠標顯示預設，強調僅展示 */
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .app-item:active {
+            transform: scale(0.92);
         }
 
         .app-icon {
-            width: 58px;
-            height: 58px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 16px; /* iOS Squircle 風格 */
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 17px; /* iOS Squircle */
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 6px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
             position: relative;
-            overflow: hidden;
         }
 
-        /* 經典頂部高光塗層 */
-        .app-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
-        }
-
-        /* 全白向量 Icon 樣式 */
         .app-icon svg {
             width: 26px;
             height: 26px;
@@ -246,60 +240,56 @@
 
         .app-name {
             font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.75);
             text-align: center;
             font-weight: 400;
-            letter-spacing: 0.3px;
         }
 
-        /* 橫向微型資訊面板 Widget */
-        .widget-banner {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 22px;
-            padding: 15px 18px;
-            margin-bottom: 25px;
+        /* 分頁指示器 (Pagination Dots) */
+        .pagination-dots {
+            height: 18px;
             display: flex;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
+            gap: 8px;
+            z-index: 10;
         }
 
-        .widget-banner-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.3s ease;
         }
 
-        .widget-banner-info svg {
-            width: 22px;
-            height: 22px;
-            stroke: var(--neon-cyan);
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .widget-banner-text {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
+        .dot.active {
+            width: 18px;
+            border-radius: 10px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
         }
 
         /* 底部固定 Dock 欄 */
         .dock-container {
-            padding: 0 20px 20px 20px;
+            padding: 8px 22px 12px 22px;
+            z-index: 10;
         }
 
         .dock {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 32px;
             padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .dock .app-item {
+            margin-bottom: 0;
         }
 
         .dock .app-icon {
@@ -308,11 +298,45 @@
             border: none;
             box-shadow: none;
         }
+
+        /* iOS 指示條 (Home Indicator Bar) */
+        .home-indicator {
+            width: 130px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            margin: 4px auto 6px auto;
+        }
+
+        /* App 禁用彈窗提示 (Preview Only Toast) */
+        .toast-notification {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(10, 15, 25, 0.9);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+            color: var(--neon-cyan);
+            letter-spacing: 0.5px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 200;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1. 加載頁面 -->
+    <!-- 1. 全黑加載頁面 -->
     <div id="loader">
         <div class="frx-logo">FRX OS</div>
         <div class="loader-bar-container">
@@ -320,162 +344,154 @@
         </div>
     </div>
 
-    <!-- 2. 展示主舞台 -->
-    <div class="stage" id="stage">
-        <div class="phone-frame" id="phoneFrame">
-            <div class="phone-screen">
+    <!-- 2. 手機全套模擬系統 -->
+    <div class="phone-container" id="phone">
+        <div class="phone-screen">
+            
+            <!-- 頂部狀態列 & 動態島 -->
+            <div class="status-bar">
+                <span id="currentTime">09:41</span>
+                <span>5G ●</span>
+            </div>
+            <div class="dynamic-island"></div>
+
+            <!-- 系統微光提示彈窗 (App 禁用告知) -->
+            <div class="toast-notification" id="toast">FRX OS Preview Mode (Apps Inactive)</div>
+
+            <!-- 可滑動分頁區塊 (Swiper Viewport) -->
+            <div class="pages-viewport" id="viewport">
                 
-                <!-- 狀態列 -->
-                <div class="status-bar">
-                    <span>9:41</span>
-                    <span>5G ●</span>
+                <!-- Page 1: Widget Center -->
+                <div class="page">
+                    <div class="widget-card">
+                        <div style="font-size: 0.75rem; color: var(--neon-cyan); font-weight:700;">SYSTEM MONITOR</div>
+                        <div style="font-size: 1.4rem; font-weight: 300; margin-top:5px;">Neural Core: 98%</div>
+                        <div style="font-size: 0.75rem; color: var(--text-sub); margin-top:4px;">Quantum Storage: 1.2 TB Free</div>
+                    </div>
+                    <div class="widget-card">
+                        <div style="font-size: 0.75rem; color: #fff; font-weight:600; margin-bottom:8px;">QUICK MEDIA</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.8rem; color: var(--text-sub);">Now Playing — FRX Ambient</span>
+                            <svg style="width:20px; stroke:#00f3ff; fill:none; stroke-width:2;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 可滑動展示內容區 -->
-                <div class="scrollable-content">
-                    
-                    <!-- 時鐘與系統資訊 Widget -->
-                    <div class="widget-clock">
-                        <div class="os-title">FRX OS CONCEPT</div>
+                <!-- Page 2: Main Home Screen (預設主頁) -->
+                <div class="page">
+                    <!-- 時鐘與品牌頭條 Widget -->
+                    <div class="widget-card clock-widget">
+                        <div class="brand-title">FRX OS SYSTEM</div>
                         <div class="time">09:41</div>
-                        <div class="date">MON, SEP 14 — NEXT GEN DESIGN</div>
+                        <div class="date">MON, SEP 14 — PURE VISION</div>
                     </div>
 
-                    <!-- 全白 App 網格 第一區 -->
+                    <!-- App 網格 Row 1 -->
                     <div class="app-grid">
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            </div>
-                            <span class="app-name">Phone</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            </div>
-                            <span class="app-name">Message</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                            </div>
-                            <span class="app-name">Browser</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            </div>
-                            <span class="app-name">Camera</span>
-                        </div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><span class="app-name">Phone</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="app-name">Message</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="app-name">Browser</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="app-name">Camera</span></div>
                     </div>
 
-                    <!-- 第二區 App 排版 -->
+                    <!-- App 網格 Row 2 -->
                     <div class="app-grid">
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            </div>
-                            <span class="app-name">Favorites</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                            </div>
-                            <span class="app-name">Music</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            </div>
-                            <span class="app-name">Calendar</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            </div>
-                            <span class="app-name">Maps</span>
-                        </div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="app-name">Favorites</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="app-name">Music</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="app-name">Calendar</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="app-name">Maps</span></div>
                     </div>
-
-                    <!-- 系統動態條 Widget -->
-                    <div class="widget-banner">
-                        <div class="widget-banner-info">
-                            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                            <span class="widget-banner-text">FRX Neural Engine Active</span>
-                        </div>
-                    </div>
-
-                    <!-- 第三區 App 排版 (測試可滑動) -->
-                    <div class="app-grid">
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                            </div>
-                            <span class="app-name">Settings</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-                            </div>
-                            <span class="app-name">Cloud</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                            </div>
-                            <span class="app-name">Vault</span>
-                        </div>
-                        <div class="app-item">
-                            <div class="app-icon">
-                                <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            </div>
-                            <span class="app-name">Power</span>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- 底部 Dock 欄 (固定位置) -->
-                <div class="dock-container">
-                    <div class="dock">
-                        <div class="app-icon">
-                            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                        </div>
-                        <div class="app-icon">
-                            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        </div>
-                        <div class="app-icon">
-                            <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                        </div>
-                        <div class="app-icon">
-                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </div>
+                <!-- Page 3: App Library -->
+                <div class="page">
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub); margin-bottom:15px; letter-spacing:1px;">APP LIBRARY</div>
+                    <div class="app-grid">
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">Settings</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><span class="app-name">Cloud</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><span class="app-name">Vault</span></div>
+                        <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="app-name">Power</span></div>
                     </div>
                 </div>
 
             </div>
+
+            <!-- 分頁指示器 (Dots) -->
+            <div class="pagination-dots">
+                <div class="dot" id="dot0"></div>
+                <div class="dot active" id="dot1"></div>
+                <div class="dot" id="dot2"></div>
+            </div>
+
+            <!-- 固定 Dock 欄 -->
+            <div class="dock-container">
+                <div class="dock">
+                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div></div>
+                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div></div>
+                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div></div>
+                    <div class="app-item"><div class="app-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+                </div>
+            </div>
+
+            <!-- Home Indicator 條 -->
+            <div class="home-indicator"></div>
+
         </div>
     </div>
 
-    <!-- 腳本控制：加載頁計時器與 3D 視差效果 -->
+    <!-- 邏輯控制腳本 -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader');
-            const stage = document.getElementById('stage');
-            const phoneFrame = document.getElementById('phoneFrame');
+            const phone = document.getElementById('phone');
+            const viewport = document.getElementById('viewport');
+            const toast = document.getElementById('toast');
 
-            // 1. 加載動畫完成後淡出並顯示主畫面 (2.5秒)
+            let currentPage = 1; // 預設主頁 (index 1)
+            let startX = 0;
+            let isSwiping = false;
+
+            // 1. 加載動畫過渡
             setTimeout(() => {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
-                stage.classList.add('visible');
-            }, 2500);
+                phone.classList.add('active');
+                updatePagePosition();
+            }, 2300);
 
-            // 2. 鼠標懸浮 3D 視差傾斜效果 (增強網站展示高級感)
-            document.addEventListener('mousemove', (e) => {
-                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-                phoneFrame.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            // 2. 切換分頁邏輯
+            function updatePagePosition() {
+                viewport.style.transform = `translateX(-${currentPage * 33.333}%)`;
+                document.querySelectorAll('.dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentPage);
+                });
+            }
+
+            // 3. 觸控 / 滑鼠拖曳橫向切換分頁 (Swipe)
+            viewport.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                isSwiping = true;
+            });
+
+            viewport.addEventListener('mouseup', (e) => {
+                if (!isSwiping) return;
+                const diffX = startX - e.clientX;
+                if (diffX > 50 && currentPage < 2) {
+                    currentPage++;
+                } else if (diffX < -50 && currentPage > 0) {
+                    currentPage--;
+                }
+                updatePagePosition();
+                isSwiping = false;
+            });
+
+            // 4. App 點擊保護與微光 Toast 提示
+            document.querySelectorAll('.app-item').forEach(app => {
+                app.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
             });
         });
     </script>
