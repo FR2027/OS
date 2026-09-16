@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FRX OS">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
   <link rel="icon" type="image/png" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
-  <title>FRX OS 1</title>
+
+  <title>FRX OS 1 Ultra Flagship</title>
 
   <style>
     :root {
       --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-      --glass-bg: rgba(255, 255, 255, 0.2);
-      --glass-border: rgba(255, 255, 255, 0.3);
-      --glass-blur: blur(25px) saturate(180%);
-      --spring: cubic-bezier(0.2, 0.9, 0.1, 1);
+      --glass-bg: rgba(255, 255, 255, 0.18);
+      --glass-border: rgba(255, 255, 255, 0.28);
+      --glass-blur: blur(35px) saturate(200%);
+      --spring-physics: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
+      --icon-size: 60px;
       --icon-radius: 16px;
-      --icon-size: 58px;
     }
 
     * {
@@ -35,6 +41,7 @@
       overflow: hidden;
       background: #000;
       color: #fff;
+      position: fixed;
     }
 
     /* 滿版 OS 系統容器 */
@@ -49,102 +56,60 @@
       flex-direction: column;
       justify-content: space-between;
       overflow: hidden;
+      transition: background-image 0.5s ease;
     }
-
-    /* 密碼解鎖層 */
-    .lockscreen {
-      position: absolute;
-      inset: 0;
-      z-index: 999;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 50px 20px 40px;
-      transition: transform 0.5s var(--spring), opacity 0.3s ease;
-    }
-
-    .lockscreen.unlocked {
-      transform: translateY(-100%);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .lock-time { font-size: 76px; font-weight: 200; letter-spacing: -2px; text-align: center; }
-    .lock-date { font-size: 18px; font-weight: 500; color: rgba(255,255,255,0.85); text-align: center; }
-
-    .passcode-box { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
-    .dots-container { display: flex; gap: 14px; margin-bottom: 8px; }
-    .pass-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #fff; transition: background 0.2s; }
-    .pass-dot.filled { background: #fff; }
-
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 20px; }
-    .key-btn {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.22);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .key-btn:active { background: rgba(255,255,255,0.5); }
-    .key-sub { font-size: 8px; letter-spacing: 1px; opacity: 0.7; }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-10px); }
-      40%, 80% { transform: translateX(10px); }
-    }
-    .shake { animation: shake 0.35s ease; }
 
     /* 頂部狀態列 & 動態島 */
     .status-bar {
-      height: 38px;
-      width: 100%;
-      padding: 0 20px;
+      height: 48px;
+      padding: 12px 24px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
-      z-index: 100;
+      z-index: 800;
+      pointer-events: none;
     }
 
     .dynamic-island {
-      min-width: 110px;
-      height: 28px;
+      width: 130px;
+      height: 32px;
       background: #000;
       border-radius: 20px;
       position: absolute;
-      top: 6px;
+      top: 8px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 101;
+      z-index: 850;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.8);
+      transition: all 0.35s var(--ease-apple);
+      cursor: pointer;
+      pointer-events: auto;
+      overflow: hidden;
     }
-    .island-dot { width: 7px; height: 7px; background: #34C759; border-radius: 50%; box-shadow: 0 0 6px #34C759; }
+    .dynamic-island.expanded {
+      width: 320px;
+      height: 70px;
+      border-radius: 35px;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(20px);
+    }
+    .island-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 8px #34C759; flex-shrink: 0; }
+    .island-content { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #fff; width: 100%; overflow: hidden; white-space: nowrap; }
 
-    /* 主畫面區域 */
+    /* 桌面區域 */
     .main-screen {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 10px 20px 100px;
-      gap: 16px;
+      padding: 10px 20px 140px;
+      gap: 20px;
       max-width: 480px;
       margin: 0 auto;
       width: 100%;
@@ -156,71 +121,141 @@
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 16px 20px;
+      border-radius: 28px;
+      padding: 18px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
     }
 
-    .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; }
-    .app-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 14px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .app-item:active { transform: scale(0.88); }
+
     .app-icon {
       width: var(--icon-size);
       height: var(--icon-size);
       border-radius: var(--icon-radius);
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 26px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-      transition: all 0.2s ease;
+      font-size: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      position: relative;
     }
-    .app-item:active .app-icon { transform: scale(0.9); }
-    .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+    .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+
+    /* iOS 抖動編輯模式 */
+    @keyframes jiggle {
+      0% { transform: rotate(-1.8deg) scale(1.02); }
+      50% { transform: rotate(1.8deg) scale(0.98); }
+      100% { transform: rotate(-1.8deg) scale(1.02); }
+    }
+    .editing .app-item { animation: jiggle 0.22s infinite ease-in-out; }
+    .remove-btn {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 22px;
+      height: 22px;
+      background: #ff3b30;
+      color: #fff;
+      border-radius: 50%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .editing .remove-btn { display: flex; }
 
     /* Dock 欄 */
-    .dock-bar {
+    .dock-wrapper {
       position: absolute;
-      bottom: 12px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 32px);
-      max-width: 400px;
-      height: 76px;
+      max-width: 420px;
       background: var(--glass-bg);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--glass-border);
-      border-radius: 32px;
+      border-radius: 38px;
+      padding: 8px 14px 12px;
+      z-index: 700;
+      transition: height 0.42s var(--spring-physics), border-radius 0.3s ease;
+      height: 94px;
+      overflow: hidden;
       display: flex;
-      justify-content: space-around;
+      flex-direction: column;
       align-items: center;
-      padding: 0 10px;
-      z-index: 200;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
 
-    /* App 視窗 */
+    .dock-handle {
+      width: 42px;
+      height: 5px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 3px;
+      margin-bottom: 8px;
+      cursor: grab;
+    }
+
+    .dock-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 16px;
+      width: 100%;
+    }
+
+    .dock-wrapper.expanded {
+      height: 184px;
+      border-radius: 42px;
+    }
+
+    /* 全螢幕 App 視窗 */
     .app-window {
       position: absolute;
       inset: 0;
       background: #121217;
-      z-index: 500;
+      z-index: 900;
       display: flex;
       flex-direction: column;
-      transform: translateY(100%);
+      transform: scale(0.85) translateY(100%);
       opacity: 0;
-      transition: transform 0.4s var(--spring), opacity 0.25s ease;
+      border-radius: 42px;
+      transition: transform 0.45s var(--ease-apple), opacity 0.3s ease, border-radius 0.35s ease;
       pointer-events: none;
+      overflow: hidden;
     }
-    .app-window.active { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .app-window.active {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      border-radius: 0px;
+      pointer-events: auto;
+    }
 
     .app-header {
-      height: 50px;
-      padding: 0 16px;
+      height: 54px;
+      padding: 0 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -229,16 +264,59 @@
       font-weight: 700;
     }
     .app-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
-    .btn-done { font-size: 14px; color: #0a84ff; background: none; border: none; cursor: pointer; font-weight: 600; }
 
-    /* 設定元件樣式 */
-    .settings-group { background: #1c1c24; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-    .settings-title { font-size: 12px; text-transform: uppercase; color: #8e8e93; margin-bottom: 8px; font-weight: 600; }
-    .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2c2c38; }
-    .settings-row:last-child { border-bottom: none; }
-    .setting-input { background: #2c2c38; border: none; padding: 8px 12px; border-radius: 8px; color: #fff; width: 100%; font-size: 14px; }
-    .setting-btn { background: #0a84ff; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    /* Home Bar */
+    .home-bar-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 26px;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 8px;
+      pointer-events: auto;
+    }
+    .home-bar {
+      width: 140px;
+      height: 5px;
+      background: #fff;
+      border-radius: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
 
+    /* 雙側兩段式手勢膠囊 */
+    .gesture-pill {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) scale(0.8);
+      width: 42px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 35px;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s, background 0.2s;
+      pointer-events: none;
+    }
+    .gesture-left { left: 12px; }
+    .gesture-right { right: 12px; }
+    .gesture-pill.stage2 { background: #0a84ff; border-color: #64d2ff; transform: translateY(-50%) scale(1.1); }
+
+    /* 各通用 UI 組件 */
+    .settings-group { background: #1c1c24; border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+    .settings-title { font-size: 12px; text-transform: uppercase; color: #8e8e93; margin-bottom: 10px; font-weight: 600; }
+    .setting-input { background: #2c2c38; border: none; padding: 10px 14px; border-radius: 10px; color: #fff; width: 100%; font-size: 14px; outline: none; }
+    .setting-btn { background: #0a84ff; color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; }
     iframe.app-iframe { width: 100%; height: 100%; border: none; flex: 1; }
   </style>
 </head>
@@ -246,307 +324,550 @@
 
   <div class="frx-os" id="frx-os">
 
-    <!-- 解鎖畫面 -->
-    <div class="lockscreen" id="lockscreen">
-      <div>
-        <div class="lock-time" id="lock-time">21:20</div>
-        <div class="lock-date">FRX OS 1 個人化旗艦</div>
+    <!-- 頂部狀態列 & 動態島 -->
+    <div class="dynamic-island" id="dynamic-island" onclick="toggleIsland()">
+      <div class="island-content" id="island-content">
+        <span id="island-text" style="font-weight:700;">FRX Pro</span>
       </div>
-
-      <div class="passcode-box" id="passcode-box">
-        <p style="font-size: 13px; letter-spacing: 1px;">請輸入密碼解鎖</p>
-        <div class="dots-container">
-          <div class="pass-dot" id="dot-1"></div>
-          <div class="pass-dot" id="dot-2"></div>
-          <div class="pass-dot" id="dot-3"></div>
-          <div class="pass-dot" id="dot-4"></div>
-        </div>
-
-        <div class="keypad">
-          <div class="key-btn" onclick="pressKey('1')">1<span class="key-sub">&nbsp;</span></div>
-          <div class="key-btn" onclick="pressKey('2')">2<span class="key-sub">ABC</span></div>
-          <div class="key-btn" onclick="pressKey('3')">3<span class="key-sub">DEF</span></div>
-          <div class="key-btn" onclick="pressKey('4')">4<span class="key-sub">GHI</span></div>
-          <div class="key-btn" onclick="pressKey('5')">5<span class="key-sub">JKL</span></div>
-          <div class="key-btn" onclick="pressKey('6')">6<span class="key-sub">MNO</span></div>
-          <div class="key-btn" onclick="pressKey('7')">7<span class="key-sub">PQRS</span></div>
-          <div class="key-btn" onclick="pressKey('8')">8<span class="key-sub">TUV</span></div>
-          <div class="key-btn" onclick="pressKey('9')">9<span class="key-sub">WXYZ</span></div>
-          <div style="width:68px;"></div>
-          <div class="key-btn" onclick="pressKey('0')">0</div>
-          <div class="key-btn" style="background:none;border:none;font-size:13px;" onclick="clearKey()">清除</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 動態島 & 狀態列 -->
-    <div class="dynamic-island" id="dynamic-island">
-      <span id="island-text" style="font-size: 10px; color: #8e8e93; font-weight:700;">FRX Pro</span>
       <div class="island-dot"></div>
     </div>
     <div class="status-bar">
       <span id="clock">21:20</span>
-      <div><span>5G</span> <span>100%</span></div>
+      <div><span>5G</span> <span style="margin-left:4px;">100%</span></div>
     </div>
 
-    <!-- 主畫面 -->
-    <div class="main-screen">
+    <!-- 主畫面內容區 -->
+    <div class="main-screen" id="main-screen">
       <div class="widget-banner">
         <div>
-          <h2 style="font-size: 18px;">FRX OS 1 智慧系統</h2>
-          <p style="font-size: 11px; color: #ccc; margin-top: 2px;">自由客製化模式已啟用</p>
+          <h2 style="font-size: 18px;">FRX OS 1 旗艦系統</h2>
+          <p style="font-size: 11px; color: #ccc; margin-top: 2px;">雙側兩段手勢 + 動態島 + 全功能 App</p>
         </div>
-        <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" style="width: 32px; height: 32px; object-fit: contain;">
+        <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" style="width: 34px; height: 34px; object-fit: contain;">
       </div>
 
-      <div class="app-grid">
-        <div class="app-item" onclick="openApp('相機')"><div class="app-icon" style="background: linear-gradient(135deg, #FF9500, #FF5E00);">📷</div><span class="app-name">相機</span></div>
-        <div class="app-item" onclick="openApp('相簿')"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #008E00);">🖼️</div><span class="app-name">相簿</span></div>
-        <div class="app-item" onclick="openApp('計算機')"><div class="app-icon" style="background: linear-gradient(135deg, #FF9F0A, #FF7B00);">🧮</div><span class="app-name">計算機</span></div>
-        <div class="app-item" onclick="openApp('設定')"><div class="app-icon" style="background: linear-gradient(135deg, #5856D6, #3634A3);">⚙️</div><span class="app-name">設定</span></div>
-        <div class="app-item" onclick="openApp('音樂')"><div class="app-icon" style="background: linear-gradient(135deg, #FF2D55, #D10040);">🎵</div><span class="app-name">音樂</span></div>
-        <div class="app-item" onclick="openApp('天氣')"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0040DD);">☁️</div><span class="app-name">天氣</span></div>
-        <div class="app-item" onclick="openApp('記事本')"><div class="app-icon" style="background: linear-gradient(135deg, #FFCC00, #FFA000);">📝</div><span class="app-name">記事本</span></div>
-        <div class="app-item" onclick="openApp('地圖')"><div class="app-icon" style="background: linear-gradient(135deg, #30B0C7, #007AFF);">🗺️</div><span class="app-name">地圖</span></div>
-      </div>
+      <div class="app-grid" id="app-grid"></div>
     </div>
 
-    <!-- Dock 欄 -->
-    <div class="dock-bar">
-      <div class="app-item" onclick="openApp('電話')"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #119922);">📞</div></div>
-      <div class="app-item" onclick="openApp('訊息')"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0055FF);">💬</div></div>
-      <div class="app-item" onclick="openApp('瀏覽器')"><div class="app-icon" style="background: linear-gradient(135deg, #55E0C4, #00A88F);">🌐</div></div>
-      <div class="app-item" onclick="openApp('音樂')"><div class="app-icon" style="background: linear-gradient(135deg, #FA114F, #AF002D);">🎧</div></div>
+    <!-- 可伸縮 Dock 欄 -->
+    <div class="dock-wrapper" id="dock-wrapper">
+      <div class="dock-handle" id="dock-handle" onclick="toggleDock()"></div>
+      <div class="dock-grid" id="dock-grid"></div>
     </div>
 
-    <!-- App 視窗 -->
+    <!-- 全螢幕 App 視窗 -->
     <div class="app-window" id="app-window">
       <div class="app-header">
         <span id="app-title">App</span>
-        <button class="btn-done" onclick="closeApp()">完成</button>
+        <button style="color:#0a84ff;background:none;border:none;font-weight:600;font-size:14px;cursor:pointer;" onclick="closeApp()">完成</button>
       </div>
       <div class="app-body" id="app-body"></div>
     </div>
 
+    <!-- iOS 底部 Home Bar 手勢條 -->
+    <div class="home-bar-area" id="home-bar-area">
+      <div class="home-bar"></div>
+    </div>
+
+    <!-- 雙側兩段式手勢指示膠囊 -->
+    <div class="gesture-pill gesture-left" id="gesture-left">‹</div>
+    <div class="gesture-pill gesture-right" id="gesture-right">›</div>
+
   </div>
 
   <script>
+    // 完整 App 清單
+    const appsData = [
+      { id: 'camera', name: '相機', icon: '📷', bg: 'linear-gradient(135deg, #FF9500, #FF5E00)' },
+      { id: 'photos', name: '相簿', icon: '🖼️', bg: 'linear-gradient(135deg, #34C759, #008E00)' },
+      { id: 'calc', name: '計算機', icon: '🧮', bg: 'linear-gradient(135deg, #FF9F0A, #FF7B00)' },
+      { id: 'settings', name: '設定', icon: '⚙️', bg: 'linear-gradient(135deg, #5856D6, #3634A3)' },
+      { id: 'music', name: '音樂', icon: '🎵', bg: 'linear-gradient(135deg, #FF2D55, #D10040)' },
+      { id: 'weather', name: '天氣', icon: '☁️', bg: 'linear-gradient(135deg, #007AFF, #0040DD)' },
+      { id: 'notes', name: '記事本', icon: '📝', bg: 'linear-gradient(135deg, #FFCC00, #FFA000)' },
+      { id: 'maps', name: '地圖', icon: '🗺️', bg: 'linear-gradient(135deg, #30B0C7, #007AFF)' },
+      { id: 'phone', name: '電話', icon: '📞', bg: 'linear-gradient(135deg, #34C759, #119922)' },
+      { id: 'messages', name: '訊息', icon: '💬', bg: 'linear-gradient(135deg, #007AFF, #0055FF)' },
+      { id: 'browser', name: '瀏覽器', icon: '🌐', bg: 'linear-gradient(135deg, #55E0C4, #00A88F)' },
+      { id: 'clockApp', name: '鬧鐘', icon: '⏰', bg: 'linear-gradient(135deg, #5E5CE6, #3634A3)' }
+    ];
+
     const os = document.getElementById('frx-os');
-    const lockscreen = document.getElementById('lockscreen');
-    const passcodeBox = document.getElementById('passcode-box');
+    const appGrid = document.getElementById('app-grid');
+    const dockGrid = document.getElementById('dock-grid');
+    const dockWrapper = document.getElementById('dock-wrapper');
     const appWindow = document.getElementById('app-window');
     const appTitle = document.getElementById('app-title');
     const appBody = document.getElementById('app-body');
     const clock = document.getElementById('clock');
-    const lockTime = document.getElementById('lock-time');
     const dynamicIsland = document.getElementById('dynamic-island');
-    const islandText = document.getElementById('island-text');
+    const islandContent = document.getElementById('island-content');
+    
+    let isEditing = false;
+    let isMusicPlaying = false;
+    let audioElem = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
 
-    // 讀取設定數據
+    // 讀取/初始化設定
     let settings = JSON.parse(localStorage.getItem('frx_settings')) || {
-      passcode: '0000',
       bgUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000',
-      iconRadius: 16,
-      iconSize: 58,
-      islandText: 'FRX Pro',
-      showIsland: true,
-      enableLockscreen: true
+      islandText: 'FRX Pro'
     };
-
-    let inputPass = '';
 
     function applySettings() {
       os.style.backgroundImage = `url('${settings.bgUrl}')`;
-      document.documentElement.style.setProperty('--icon-radius', `${settings.iconRadius}px`);
-      document.documentElement.style.setProperty('--icon-size', `${settings.iconSize}px`);
-      islandText.textContent = settings.islandText;
-      dynamicIsland.style.display = settings.showIsland ? 'flex' : 'none';
-      if (!settings.enableLockscreen) lockscreen.classList.add('unlocked');
-      localStorage.setItem('frx_settings', JSON.stringify(settings));
+      document.getElementById('island-text').textContent = settings.islandText;
     }
     applySettings();
 
+    // 渲染 Apps
+    function renderApps() {
+      appGrid.innerHTML = '';
+      dockGrid.innerHTML = '';
+
+      appsData.slice(0, 8).forEach(app => appGrid.appendChild(createAppElem(app)));
+      appsData.slice(4, 12).forEach(app => dockGrid.appendChild(createAppElem(app, true)));
+    }
+
+    function createAppElem(app, isDock = false) {
+      const item = document.createElement('div');
+      item.className = 'app-item';
+      item.onclick = () => { if (!isEditing) openApp(app.name); };
+
+      let pressTimer;
+      item.ontouchstart = () => { pressTimer = setTimeout(enableEditing, 600); };
+      item.ontouchend = () => clearTimeout(pressTimer);
+
+      item.innerHTML = `
+        <div class="remove-btn" onclick="event.stopPropagation(); removeApp(this)">—</div>
+        <div class="app-icon" style="background:${app.bg};">${app.icon}</div>
+        ${!isDock ? `<span class="app-name">${app.name}</span>` : ''}
+      `;
+      return item;
+    }
+
+    function enableEditing() {
+      isEditing = true;
+      document.body.classList.add('editing');
+    }
+
+    document.getElementById('main-screen').onclick = (e) => {
+      if (e.target.id === 'main-screen' || e.target.className === 'app-grid') {
+        isEditing = false;
+        document.body.classList.remove('editing');
+      }
+    };
+
+    function removeApp(btn) {
+      btn.parentElement.style.transform = 'scale(0)';
+      setTimeout(() => btn.parentElement.remove(), 200);
+    }
+
+    // Dock 伸縮
+    function toggleDock() {
+      dockWrapper.classList.toggle('expanded');
+    }
+
+    let dockStartY = 0;
+    dockWrapper.addEventListener('touchstart', (e) => { dockStartY = e.touches[0].clientY; });
+    dockWrapper.addEventListener('touchend', (e) => {
+      const diffY = dockStartY - e.changedTouches[0].clientY;
+      if (diffY > 25) dockWrapper.classList.add('expanded');
+      else if (diffY < -25) dockWrapper.classList.remove('expanded');
+    });
+
+    // 時間更新
     function updateTime() {
       const now = new Date();
-      const hrs = String(now.getHours()).padStart(2, '0');
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      clock.textContent = `${hrs}:${mins}`;
-      lockTime.textContent = `${hrs}:${mins}`;
+      clock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
     setInterval(updateTime, 1000);
     updateTime();
 
-    function pressKey(num) {
-      if (inputPass.length < 4) {
-        inputPass += num;
-        updatePassDots();
-      }
-
-      if (inputPass.length === 4) {
-        setTimeout(() => {
-          if (inputPass === settings.passcode) {
-            lockscreen.classList.add('unlocked');
-            inputPass = '';
-            updatePassDots();
-          } else {
-            passcodeBox.classList.add('shake');
-            setTimeout(() => {
-              passcodeBox.classList.remove('shake');
-              inputPass = '';
-              updatePassDots();
-            }, 350);
-          }
-        }, 100);
-      }
+    // 動態島互動
+    function toggleIsland() {
+      dynamicIsland.classList.toggle('expanded');
     }
 
-    function clearKey() { inputPass = ''; updatePassDots(); }
-
-    function updatePassDots() {
-      for (let i = 1; i <= 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if (i <= inputPass.length) dot.classList.add('filled');
-        else dot.classList.remove('filled');
-      }
+    function setIslandContent(html) {
+      islandContent.innerHTML = html;
     }
 
+    // App 打開與內部邏輯
     function openApp(name) {
       appTitle.textContent = name;
       appBody.innerHTML = '';
 
-      if (name === '設定') {
+      if (name === '相機') {
         appBody.innerHTML = `
-          <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
-            <div style="padding:16px;background:#1c1c24;border-radius:14px;text-align:center;">
-              <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" style="width:50px;height:50px;object-fit:contain;margin-bottom:8px;">
-              <h3>FRX OS 1 客製化中心</h3>
-              <p style="font-size:12px;color:#8e8e93;margin-top:4px;">系統版本 1.0.0 (純淨旗艦版)</p>
+          <div style="flex:1;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;">
+            <video id="camera-video" autoplay playsinline style="width:100%;height:70%;object-fit:cover;border-radius:24px;background:#222;"></video>
+            <div style="display:flex;align-items:center;justify-content:space-around;width:100%;padding:20px 0;">
+              <div style="width:50px;"></div>
+              <button onclick="takePhoto()" style="width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:none;cursor:pointer;"></button>
+              <div style="width:50px;"></div>
             </div>
-
-            <!-- 1. 桌布與外觀 -->
-            <div class="settings-group">
-              <div class="settings-title">🎨 桌面與鎖屏桌布</div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <input type="text" id="cfg-bg-url" class="setting-input" value="${settings.bgUrl}" placeholder="輸入圖片網址 URL">
-                <div style="display:flex;gap:8px;">
-                  <button class="setting-btn" style="flex:1;" onclick="updateBgUrl()">套用網址圖片</button>
-                  <label class="setting-btn" style="background:#34c759;cursor:pointer;">
-                    上傳照片
-                    <input type="file" accept="image/*" style="display:none;" onchange="uploadLocalBg(event)">
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. 圖示尺寸與圓角 -->
-            <div class="settings-group">
-              <div class="settings-title">📱 App 圖示客製化</div>
-              <div class="settings-row">
-                <span>圖示圓角 (${settings.iconRadius}px)</span>
-                <input type="range" min="0" max="30" value="${settings.iconRadius}" oninput="updateIconStyle('iconRadius', this.value)">
-              </div>
-              <div class="settings-row">
-                <span>圖示大小 (${settings.iconSize}px)</span>
-                <input type="range" min="45" max="70" value="${settings.iconSize}" oninput="updateIconStyle('iconSize', this.value)">
-              </div>
-            </div>
-
-            <!-- 3. 動態島設定 -->
-            <div class="settings-group">
-              <div class="settings-title">🏝️ 動態島設定</div>
-              <div class="settings-row">
-                <span>顯示動態島</span>
-                <input type="checkbox" ${settings.showIsland ? 'checked' : ''} onchange="toggleIsland(this.checked)">
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px;">
-                <input type="text" id="cfg-island-text" class="setting-input" value="${settings.islandText}" placeholder="動態島文字">
-                <button class="setting-btn" onclick="updateIslandText()">套用</button>
-              </div>
-            </div>
-
-            <!-- 4. 安全性與解鎖 -->
-            <div class="settings-group">
-              <div class="settings-title">🔒 鎖屏與安全性</div>
-              <div class="settings-row">
-                <span>啟用數字密碼鎖</span>
-                <input type="checkbox" ${settings.enableLockscreen ? 'checked' : ''} onchange="toggleLockscreen(this.checked)">
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px;">
-                <input type="password" id="cfg-pass" maxlength="4" class="setting-input" placeholder="修改 4 位密碼 (目前:${settings.passcode})">
-                <button class="setting-btn" onclick="updatePasscode()">儲存</button>
-              </div>
-            </div>
-
-            <button onclick="lockscreen.classList.remove('unlocked');closeApp();" class="setting-btn" style="background:#ff3b30;padding:12px;">🔒 立即鎖定手機</button>
-            <button onclick="resetSettings()" class="setting-btn" style="background:#8e8e93;padding:12px;">🔄 恢復出廠設定</button>
           </div>
         `;
+        startCamera();
+        setIslandContent('🟢 <span>相機使用中</span>');
+
+      } else if (name === '相簿') {
+        renderPhotosApp();
+
+      } else if (name === '計算機') {
+        renderCalcApp();
+
+      } else if (name === '音樂') {
+        renderMusicApp();
+
+      } else if (name === '天氣') {
+        renderWeatherApp();
+
+      } else if (name === '記事本') {
+        renderNotesApp();
 
       } else if (name === '瀏覽器') {
         appBody.innerHTML = `
-          <div style="padding:10px;background:#1c1c24;display:flex;gap:8px;">
-            <input type="text" id="browser-url" value="https://bing.com" class="setting-input">
+          <div style="padding:10px;background:#1c1c24;display:flex;gap:8px;align-items:center;">
+            <input type="text" id="browser-url" value="https://duckduckgo.com" class="setting-input">
             <button onclick="navigateUrl()" class="setting-btn">前往</button>
           </div>
-          <iframe id="browser-iframe" class="app-iframe" src="https://bing.com"></iframe>
+          <iframe id="browser-iframe" class="app-iframe" src="https://duckduckgo.com"></iframe>
         `;
 
       } else if (name === '地圖') {
-        appBody.innerHTML = `
-          <iframe class="app-iframe" src="https://www.openstreetmap.org/export/embed.html?bbox=121.50,25.00,121.58,25.08&layer=mapnik"></iframe>
-        `;
+        appBody.innerHTML = `<iframe class="app-iframe" src="https://www.openstreetmap.org/export/embed.html?bbox=121.50,25.00,121.58,25.08&layer=mapnik"></iframe>`;
 
-      } else if (name === '計算機') {
-        appBody.innerHTML = `
-          <div style="margin:auto;width:100%;max-width:300px;text-align:right;padding:20px;">
-            <div id="calc-res" style="font-size:48px;margin-bottom:20px;">0</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-              <button onclick="calc('C')" style="height:60px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:20px;">C</button>
-              <button onclick="calc('/')" style="height:60px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:20px;">÷</button>
-              <button onclick="calc('*')" style="height:60px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:20px;">×</button>
-              <button onclick="calc('-')" style="height:60px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:20px;">-</button>
-              <button onclick="calc('7')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">7</button>
-              <button onclick="calc('8')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">8</button>
-              <button onclick="calc('9')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">9</button>
-              <button onclick="calc('+')" style="height:60px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:20px;">+</button>
-              <button onclick="calc('4')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">4</button>
-              <button onclick="calc('5')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">5</button>
-              <button onclick="calc('6')" style="height:60px;border-radius:50%;border:none;background:#333;color:#fff;font-size:20px;">6</button>
-              <button onclick="calc('=')" style="height:60px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:20px;">=</button>
-            </div>
-          </div>
-        `;
+      } else if (name === '電話') {
+        renderPhoneApp();
 
-      } else if (name === '記事本') {
-        const saved = localStorage.getItem('frx_notes') || '';
-        appBody.innerHTML = `
-          <div style="padding:16px;display:flex;flex-direction:column;height:100%;">
-            <textarea id="note-txt" style="flex:1;background:none;border:none;color:#fff;font-size:16px;outline:none;resize:none;" placeholder="在此輸入筆記...">${saved}</textarea>
-            <button onclick="saveNote()" class="setting-btn" style="background:#34c759;padding:12px;">儲存筆記</button>
-          </div>
-        `;
+      } else if (name === '訊息') {
+        renderMessagesApp();
 
-      } else {
-        appBody.innerHTML = `
-          <div style="margin:auto;text-align:center;padding:20px;">
-            <div style="font-size:50px;margin-bottom:10px;">📲</div>
-            <h3>${name} 正常運作中</h3>
-          </div>
-        `;
+      } else if (name === '鬧鐘') {
+        renderClockApp();
+
+      } else if (name === '設定') {
+        renderSettingsApp();
       }
 
       appWindow.classList.add('active');
     }
 
-    function closeApp() { appWindow.classList.remove('active'); }
+    function closeApp() {
+      appWindow.classList.remove('active');
+      stopCamera();
+      if (!isMusicPlaying) {
+        setIslandContent(`<span id="island-text" style="font-weight:700;">${settings.islandText}</span>`);
+      }
+    }
 
-    // 設定操作函式
+    /* --- 各 Apps 核心功能實現 --- */
+
+    // 1. 相機 & 照片
+    let videoStream = null;
+    async function startCamera() {
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        const video = document.getElementById('camera-video');
+        if (video) video.srcObject = videoStream;
+      } catch (err) {
+        alert('請允許相機存取權限以進行拍照');
+      }
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+      }
+    }
+
+    function takePhoto() {
+      const video = document.getElementById('camera-video');
+      if (!video) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      photos.unshift(dataUrl);
+      localStorage.setItem('frx_photos', JSON.stringify(photos));
+      alert('📸 照片已成功拍攝並寫入相簿！');
+    }
+
+    function renderPhotosApp() {
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      appBody.innerHTML = `
+        <div style="padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          ${photos.map((p, idx) => `
+            <div style="position:relative;height:110px;">
+              <img src="${p}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+              <button onclick="deletePhoto(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;">✕</button>
+            </div>
+          `).join('')}
+          ${photos.length === 0 ? '<p style="grid-column:span 3;text-align:center;color:#8e8e93;margin-top:40px;">尚無照片，請使用相機 App 拍照</p>' : ''}
+        </div>
+      `;
+    }
+
+    function deletePhoto(idx) {
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      photos.splice(idx, 1);
+      localStorage.setItem('frx_photos', JSON.stringify(photos));
+      renderPhotosApp();
+    }
+
+    // 2. 修復完全版計算機（支援連續運算）
+    let calcExpr = '0';
+    function renderCalcApp() {
+      appBody.innerHTML = `
+        <div style="margin:auto;width:100%;max-width:320px;padding:20px;display:flex;flex-direction:column;height:100%;justify-content:flex-end;">
+          <div id="calc-res" style="font-size:48px;text-align:right;margin-bottom:20px;word-break:break-all;font-weight:300;">${calcExpr}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <button onclick="pressCalc('C')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:22px;font-weight:600;">C</button>
+            <button onclick="pressCalc('+/-')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:20px;font-weight:600;">±</button>
+            <button onclick="pressCalc('%')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:20px;font-weight:600;">%</button>
+            <button onclick="pressCalc('/')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">÷</button>
+            
+            <button onclick="pressCalc('7')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">7</button>
+            <button onclick="pressCalc('8')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">8</button>
+            <button onclick="pressCalc('9')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">9</button>
+            <button onclick="pressCalc('*')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">×</button>
+            
+            <button onclick="pressCalc('4')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">4</button>
+            <button onclick="pressCalc('5')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">5</button>
+            <button onclick="pressCalc('6')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">6</button>
+            <button onclick="pressCalc('-')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">-</button>
+            
+            <button onclick="pressCalc('1')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">1</button>
+            <button onclick="pressCalc('2')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">2</button>
+            <button onclick="pressCalc('3')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">3</button>
+            <button onclick="pressCalc('+')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">+</button>
+            
+            <button onclick="pressCalc('0')" style="height:65px;border-radius:35px;border:none;background:#333;color:#fff;font-size:22px;grid-column:span 2;text-align:left;padding-left:25px;">0</button>
+            <button onclick="pressCalc('.')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">.</button>
+            <button onclick="pressCalc('=')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">=</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function pressCalc(v) {
+      const res = document.getElementById('calc-res');
+      if (v === 'C') {
+        calcExpr = '0';
+      } else if (v === '=') {
+        try {
+          calcExpr = String(Function(`'use strict'; return (${calcExpr})`)());
+        } catch {
+          calcExpr = 'Error';
+        }
+      } else if (v === '+/-') {
+        calcExpr = calcExpr.startsWith('-') ? calcExpr.slice(1) : '-' + calcExpr;
+      } else if (v === '%') {
+        calcExpr = String(parseFloat(calcExpr) / 100);
+      } else {
+        calcExpr = (calcExpr === '0' || calcExpr === 'Error') ? v : calcExpr + v;
+      }
+      if (res) res.textContent = calcExpr;
+    }
+
+    // 3. 音樂播放器
+    function renderMusicApp() {
+      appBody.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;">
+          <div style="width:200px;height:200px;background:linear-gradient(135deg, #FF2D55, #5856D6);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;box-shadow:0 15px 35px rgba(255,45,85,0.4);margin-bottom:30px;">
+            🎵
+          </div>
+          <h2 style="font-size:22px;margin-bottom:6px;">FRX Ultra Beats</h2>
+          <p style="color:#8e8e93;font-size:14px;margin-bottom:30px;">SoundHelix Demo Track</p>
+          
+          <button onclick="togglePlayMusic()" style="width:70px;height:70px;border-radius:50%;background:#0a84ff;color:#fff;border:none;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(10,132,255,0.4);">
+            ${isMusicPlaying ? '⏸' : '▶'}
+          </button>
+        </div>
+      `;
+    }
+
+    function togglePlayMusic() {
+      if (isMusicPlaying) {
+        audioElem.pause();
+        isMusicPlaying = false;
+        setIslandContent(`<span id="island-text" style="font-weight:700;">${settings.islandText}</span>`);
+      } else {
+        audioElem.play();
+        isMusicPlaying = true;
+        setIslandContent('🎵 <span style="color:#FF2D55;font-weight:bold;">播放中: FRX Ultra Beats</span>');
+      }
+      renderMusicApp();
+    }
+
+    // 4. 天氣 App
+    function renderWeatherApp() {
+      appBody.innerHTML = `
+        <div style="padding:24px;display:flex;flex-direction:column;align-items:center;">
+          <h2 style="font-size:28px;">台北市</h2>
+          <div style="font-size:72px;font-weight:200;margin:10px 0;">26°</div>
+          <p style="font-weight:600;color:#8e8e93;margin-bottom:20px;">多雲時晴</p>
+          <div style="width:100%;background:#1c1c24;border-radius:16px;padding:16px;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2c2c38;">
+              <span>今天</span><span>⛅ 26° / 21°</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2c2c38;">
+              <span>明天</span><span>🌧️ 24° / 20°</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span>後天</span><span>☀️ 28° / 22°</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 5. 記事本 App
+    function renderNotesApp() {
+      const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="note-input" placeholder="新增筆記..." class="setting-input">
+            <button onclick="addNote()" class="setting-btn">儲存</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${notes.map((n, i) => `
+              <div style="background:#1c1c24;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+                <span>${n}</span>
+                <button onclick="deleteNote(${i})" style="background:none;border:none;color:#ff3b30;cursor:pointer;font-weight:bold;">刪除</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function addNote() {
+      const inp = document.getElementById('note-input');
+      if (inp && inp.value.trim()) {
+        const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+        notes.unshift(inp.value.trim());
+        localStorage.setItem('frx_notes', JSON.stringify(notes));
+        renderNotesApp();
+      }
+    }
+
+    function deleteNote(i) {
+      const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+      notes.splice(i, 1);
+      localStorage.setItem('frx_notes', JSON.stringify(notes));
+      renderNotesApp();
+    }
+
+    // 6. 電話 App
+    let dialNum = '';
+    function renderPhoneApp() {
+      appBody.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;align-items:center;">
+          <div id="dial-display" style="font-size:36px;height:50px;margin-bottom:20px;font-weight:300;">${dialNum}</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:280px;margin-bottom:20px;">
+            ${['1','2','3','4','5','6','7','8','9','*','0','#'].map(n => `
+              <button onclick="pressDial('${n}')" style="height:65px;border-radius:50%;background:#2c2c38;color:#fff;border:none;font-size:24px;">${n}</button>
+            `).join('')}
+          </div>
+          <button onclick="makeCall()" style="width:65px;height:65px;border-radius:50%;background:#34c759;color:#fff;border:none;font-size:28px;">📞</button>
+        </div>
+      `;
+    }
+
+    function pressDial(n) {
+      dialNum += n;
+      const d = document.getElementById('dial-display');
+      if (d) d.textContent = dialNum;
+    }
+
+    function makeCall() {
+      if (dialNum) {
+        alert('📞 正在撥打給: ' + dialNum);
+        dialNum = '';
+        renderPhoneApp();
+      }
+    }
+
+    // 7. 訊息 App
+    function renderMessagesApp() {
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#1c1c24;padding:14px;border-radius:16px;">
+            <strong style="color:#0a84ff;">FRX 客服助手</strong>
+            <p style="margin-top:4px;color:#ccc;font-size:14px;">歡迎使用 FRX OS 1 旗艦系統！</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // 8. 鬧鐘 App
+    function renderClockApp() {
+      appBody.innerHTML = `
+        <div style="padding:20px;text-align:center;">
+          <h2 style="font-size:48px;font-weight:200;" id="clock-big">00:00:00</h2>
+          <p style="color:#8e8e93;margin-top:8px;">世界標準時間 (Local)</p>
+        </div>
+      `;
+      setInterval(() => {
+        const d = new Date();
+        const elem = document.getElementById('clock-big');
+        if (elem) elem.textContent = d.toTimeString().split(' ')[0];
+      }, 1000);
+    }
+
+    // 9. 設定 App
+    function renderSettingsApp() {
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="padding:16px;background:#1c1c24;border-radius:16px;text-align:center;">
+            <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" style="width:50px;height:50px;object-fit:contain;margin-bottom:8px;">
+            <h3>FRX OS 1 旗艦客製化中心</h3>
+            <p style="font-size:12px;color:#8e8e93;margin-top:4px;">全功能模擬版</p>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-title">🎨 桌布設定</div>
+            <input type="text" id="cfg-bg-url" class="setting-input" value="${settings.bgUrl}" placeholder="圖片 URL">
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="setting-btn" style="flex:1;" onclick="updateBgUrl()">套用網址</button>
+              <label class="setting-btn" style="background:#34c759;cursor:pointer;">
+                上傳照片
+                <input type="file" accept="image/*" style="display:none;" onchange="uploadLocalBg(event)">
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-title">🏝️ 動態島標題</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="cfg-island-text" class="setting-input" value="${settings.islandText}">
+              <button class="setting-btn" onclick="updateIslandText()">更新</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function navigateUrl() {
+      let url = document.getElementById('browser-url').value;
+      if (!url.startsWith('http')) url = 'https://' + url;
+      document.getElementById('browser-iframe').src = url;
+    }
+
     function updateBgUrl() {
       const url = document.getElementById('cfg-bg-url').value;
       if (url) {
         settings.bgUrl = url;
+        localStorage.setItem('frx_settings', JSON.stringify(settings));
         applySettings();
-        alert('✨ 桌布網址套用成功！');
+        alert('✨ 桌布套用成功！');
       }
     }
 
@@ -556,75 +877,82 @@
         const reader = new FileReader();
         reader.onload = function(evt) {
           settings.bgUrl = evt.target.result;
+          localStorage.setItem('frx_settings', JSON.stringify(settings));
           applySettings();
-          alert('🖼️ 本地照片已成功設定為桌布！');
+          alert('🖼️ 照片已成功設定為桌布！');
         };
         reader.readAsDataURL(file);
       }
-    }
-
-    function updateIconStyle(key, val) {
-      settings[key] = val;
-      applySettings();
-    }
-
-    function toggleIsland(checked) {
-      settings.showIsland = checked;
-      applySettings();
     }
 
     function updateIslandText() {
       const txt = document.getElementById('cfg-island-text').value;
       if (txt) {
         settings.islandText = txt;
+        localStorage.setItem('frx_settings', JSON.stringify(settings));
         applySettings();
-        alert('🏝️ 動態島文字已更新！');
       }
     }
 
-    function toggleLockscreen(checked) {
-      settings.enableLockscreen = checked;
-      applySettings();
-    }
+    // 雙側兩段式手勢與 iOS 底部 Home Bar 手勢
+    let touchStartX = 0, touchStartY = 0;
+    const gLeft = document.getElementById('gesture-left');
+    const gRight = document.getElementById('gesture-right');
 
-    function updatePasscode() {
-      const p = document.getElementById('cfg-pass').value;
-      if (p.length === 4 && !isNaN(p)) {
-        settings.passcode = p;
-        applySettings();
-        alert('🔑 解鎖密碼已更換為：' + p);
-      } else {
-        alert('請輸入 4 位數字');
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      const currentX = e.touches[0].clientX;
+      const diffX = currentX - touchStartX;
+
+      if (touchStartX < 35 && diffX > 0) {
+        gLeft.style.opacity = '1';
+        if (diffX > 130) {
+          gLeft.classList.add('stage2');
+          gLeft.innerHTML = '⌂';
+        } else {
+          gLeft.classList.remove('stage2');
+          gLeft.innerHTML = '‹';
+        }
+      } else if (touchStartX > window.innerWidth - 35 && diffX < 0) {
+        gRight.style.opacity = '1';
+        if (Math.abs(diffX) > 130) {
+          gRight.classList.add('stage2');
+          gRight.innerHTML = '⌂';
+        } else {
+          gRight.classList.remove('stage2');
+          gRight.innerHTML = '›';
+        }
       }
-    }
+    });
 
-    function resetSettings() {
-      if (confirm('確定要恢復出廠設定嗎？')) {
-        localStorage.removeItem('frx_settings');
-        location.reload();
+    window.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - touchStartX;
+      const diffY = touchStartY - e.changedTouches[0].clientY;
+
+      gLeft.style.opacity = '0';
+      gRight.style.opacity = '0';
+
+      if ((touchStartX < 35 && diffX > 50) || (touchStartX > window.innerWidth - 35 && diffX < -50)) {
+        if (Math.abs(diffX) > 130) {
+          closeApp();
+        } else {
+          const iframe = document.getElementById('browser-iframe');
+          if (iframe && iframe.contentWindow) {
+            try { iframe.contentWindow.history.back(); } catch(e){}
+          }
+        }
       }
-    }
 
-    function navigateUrl() {
-      let url = document.getElementById('browser-url').value;
-      if (!url.startsWith('http')) url = 'https://' + url;
-      document.getElementById('browser-iframe').src = url;
-    }
+      if (touchStartY > window.innerHeight - 50 && diffY > 50) {
+        closeApp();
+      }
+    });
 
-    function saveNote() {
-      const txt = document.getElementById('note-txt').value;
-      localStorage.setItem('frx_notes', txt);
-      alert('📝 筆記已成功儲存！');
-    }
-
-    let cVal = '0';
-    function calc(v) {
-      const d = document.getElementById('calc-res');
-      if (v === 'C') cVal = '0';
-      else if (v === '=') { try { cVal = eval(cVal).toString(); } catch { cVal = 'Error'; } }
-      else { cVal = (cVal === '0') ? v : cVal + v; }
-      d.textContent = cVal;
-    }
+    renderApps();
   </script>
 </body>
 </html>
