@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>FRX OS 1</title>
+  <title>FRX OS 1 - Ultra Mobile System</title>
   <style>
-    /* ==========================================
-       1. 全局設計系統 (iOS Glassmorphism & Liquid UI)
-       ========================================== */
     :root {
-      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-      --glass-bg: rgba(255, 255, 255, 0.15);
-      --glass-border: rgba(255, 255, 255, 0.25);
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      --glass-bg: rgba(255, 255, 255, 0.16);
+      --glass-border: rgba(255, 255, 255, 0.28);
       --glass-blur: blur(35px) saturate(190%);
-      --glass-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.4);
-      --dock-collapsed: 98px;
+      --dock-collapsed: 96px;
       --dock-expanded: 184px;
-      --spring-curve: cubic-bezier(0.19, 1, 0.22, 1);
+      --spring: cubic-bezier(0.19, 1, 0.22, 1);
     }
 
     * {
@@ -27,20 +21,19 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      font-family: var(--font-family);
+      font-family: var(--font);
     }
 
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
-      background: #050508;
+      background: #000;
       color: #fff;
     }
 
-    /* 滿版動態桌布 (Liquid Wallpaper) */
-    .frx-container {
+    /* 滿版 OS 容器 */
+    .frx-os {
       width: 100vw;
       height: 100vh;
       position: relative;
@@ -48,18 +41,14 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
       overflow: hidden;
     }
 
-    /* ==========================================
-       2. 頂部狀態欄與動態島 (Dynamic Island & Status)
-       ========================================== */
+    /* 頂部狀態欄與動態島 */
     .status-bar {
-      height: 48px;
+      height: 44px;
       width: 100%;
-      padding: 0 28px;
+      padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -69,8 +58,8 @@
     }
 
     .dynamic-island {
-      width: 120px;
-      height: 32px;
+      width: 110px;
+      height: 30px;
       background: #000;
       border-radius: 20px;
       position: absolute;
@@ -80,122 +69,81 @@
       z-index: 101;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      justify-content: center;
+      gap: 6px;
     }
 
-    .island-dot {
-      width: 10px;
-      height: 10px;
-      background: #09f;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #09f;
-    }
+    .island-text { font-size: 10px; color: #8e8e93; font-weight: 700; }
 
-    /* ==========================================
-       3. 主螢幕系統 (Workspace & Widgets)
-       ========================================== */
+    /* 主螢幕 (Workspace) */
     .workspace {
       flex: 1;
       width: 100%;
       max-width: 480px;
       margin: 0 auto;
-      padding: 12px 24px 120px;
+      padding: 16px 24px 120px;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      transition: transform 0.45s var(--spring-curve), opacity 0.4s ease;
+      transition: transform 0.4s var(--spring), filter 0.4s ease, opacity 0.4s ease;
       overflow-y: auto;
-      scrollbar-width: none;
     }
 
-    .workspace::-webkit-scrollbar { display: none; }
-
-    /* 當 Dock 拉伸展開時，主畫面後退並微縮 */
-    .frx-container.dock-active .workspace {
-      transform: translateY(-24px) scale(0.96);
-      opacity: 0.75;
+    .frx-os.dock-active .workspace {
+      transform: translateY(-20px) scale(0.96);
       filter: blur(2px);
+      opacity: 0.8;
     }
 
-    /* 大型系統 Widget */
-    .widget-hero {
+    .widget-banner {
       background: var(--glass-bg);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--glass-border);
-      border-radius: 30px;
-      padding: 22px 24px;
-      box-shadow: var(--glass-shadow);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .widget-hero .os-tag {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.4) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .widget-hero .os-desc {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-top: 4px;
-    }
-
-    /* 4x4 主螢幕 App 網格 */
     .app-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 22px 18px;
+      gap: 20px 16px;
     }
 
     .app-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
     }
 
     .app-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.12);
+      width: 62px;
+      height: 62px;
+      border-radius: 17px;
+      background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.25);
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 28px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease;
     }
 
-    .app-item:active .app-icon {
-      transform: scale(0.88);
-    }
+    .app-item:active .app-icon { transform: scale(0.88); }
+    .app-name { font-size: 12px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
-    .app-name {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: -0.1px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-    }
-
-    /* ==========================================
-       4. 核心功能：可拉伸 8 Apps 快捷 Dock (Break the Norm)
-       ========================================== */
+    /* 可拉伸 Dock 欄 (核心功能) */
     .dock-wrapper {
       position: absolute;
-      bottom: 24px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: calc(100% - 32px);
@@ -205,218 +153,251 @@
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--glass-border);
-      border-radius: 40px;
-      padding: 10px 16px;
-      box-shadow: var(--glass-shadow), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.4);
-      transition: height 0.5s var(--spring-curve), background 0.3s ease;
+      border-radius: 38px;
+      padding: 10px 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      transition: height 0.45s var(--spring), background 0.3s ease;
       overflow: hidden;
       z-index: 200;
       touch-action: none;
     }
 
-    /* 頂部拉伸指示條 */
     .dock-pill {
-      width: 40px;
+      width: 36px;
       height: 4px;
       background: rgba(255, 255, 255, 0.5);
       border-radius: 2px;
-      margin: 0 auto 10px;
-      cursor: grab;
-      transition: width 0.3s ease, background 0.3s ease;
+      margin: 0 auto 8px;
     }
 
     .dock-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(2, 64px);
-      gap: 16px;
+      grid-template-rows: repeat(2, 62px);
+      gap: 14px;
       width: 100%;
     }
 
-    /* 第二排 Apps (5~8) 預設隱藏並帶有位移漸變 */
+    /* 隱藏第二排 (5~8) */
     .dock-grid .app-item:nth-child(n+5) {
       opacity: 0;
-      transform: translateY(30px) scale(0.75);
-      transition: opacity 0.35s ease, transform 0.4s var(--spring-curve);
+      transform: translateY(25px) scale(0.8);
+      transition: opacity 0.35s ease, transform 0.35s var(--spring);
       pointer-events: none;
     }
 
-    /* Dock 展開狀態樣式 */
-    .frx-container.dock-active .dock-wrapper {
+    /* 展開 Dock 狀態 */
+    .frx-os.dock-active .dock-wrapper {
       height: var(--dock-expanded);
-      background: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.24);
     }
 
-    .frx-container.dock-active .dock-pill {
-      width: 56px;
-      background: rgba(255, 255, 255, 0.8);
-    }
-
-    .frx-container.dock-active .dock-grid .app-item:nth-child(n+5) {
+    .frx-os.dock-active .dock-grid .app-item:nth-child(n+5) {
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: auto;
     }
 
-    /* 展開時第二排 4 個 App 的階梯式交錯動畫 */
-    .frx-container.dock-active .dock-grid .app-item:nth-child(5) { transition-delay: 0.04s; }
-    .frx-container.dock-active .dock-grid .app-item:nth-child(6) { transition-delay: 0.08s; }
-    .frx-container.dock-active .dock-grid .app-item:nth-child(7) { transition-delay: 0.12s; }
-    .frx-container.dock-active .dock-grid .app-item:nth-child(8) { transition-delay: 0.16s; }
+    .frx-os.dock-active .dock-grid .app-item:nth-child(5) { transition-delay: 0.04s; }
+    .frx-os.dock-active .dock-grid .app-item:nth-child(6) { transition-delay: 0.08s; }
+    .frx-os.dock-active .dock-grid .app-item:nth-child(7) { transition-delay: 0.12s; }
+    .frx-os.dock-active .dock-grid .app-item:nth-child(8) { transition-delay: 0.16s; }
 
-    /* 全螢幕底部 Home Indicator */
+    /* 底部 Home Bar (點擊或上滑回到主畫面) */
     .home-bar {
-      width: 140px;
+      width: 134px;
       height: 5px;
       background: #fff;
       border-radius: 3px;
       position: absolute;
-      bottom: 8px;
+      bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 250;
-      pointer-events: none;
+      z-index: 300;
+      cursor: pointer;
+    }
+
+    /* 滿版應用程式視窗 (App Window System) */
+    .app-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #121217;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.45s var(--spring);
+    }
+
+    .app-screen.active {
+      transform: translateY(0);
+    }
+
+    .app-header {
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .app-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn {
+      font-size: 14px;
+      color: #0a84ff;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="frx-container" id="frx-system">
-    
-    <!-- 1. 頂部狀態欄與動態島 -->
-    <div class="dynamic-island">
-      <span style="font-size: 11px; color: #8e8e93;">FRX Core</span>
-      <div class="island-dot"></div>
-    </div>
-
+  <div class="frx-os" id="frx-os">
+    <!-- 頂部狀態列 -->
+    <div class="dynamic-island"><span class="island-text">FRX OS 1</span></div>
     <div class="status-bar">
       <span id="clock">09:41</span>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span>5G</span>
-        <span>100%</span>
-      </div>
+      <div><span>5G</span> <span>100%</span></div>
     </div>
 
-    <!-- 2. 主螢幕空間 Workspace -->
+    <!-- 主畫面 Workspace -->
     <div class="workspace">
-      <!-- 系統抬頭卡片 -->
-      <div class="widget-hero">
+      <div class="widget-banner">
         <div>
-          <div class="os-tag">FRX OS 1</div>
-          <div class="os-desc">打破常規：向上拉伸底部 Dock 體驗 8 Apps</div>
+          <h2 style="font-size: 22px;">FRX OS 1</h2>
+          <p style="font-size: 12px; color: #aaa; margin-top: 4px;">點擊 Dock 以外任意處可自動收回 Dock</p>
         </div>
-        <div style="font-size: 32px;">✨</div>
+        <span style="font-size: 30px;">🚀</span>
       </div>
 
-      <!-- 主螢幕圖示網格 -->
       <div class="app-grid">
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FF9500, #FF5E00);">📷</div><span class="app-name">相機</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #008E00);">🖼️</div><span class="app-name">相簿</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #5856D6, #3634A3);">⚙️</div><span class="app-name">設定</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FF2D55, #D10040);">🎵</div><span class="app-name">音樂</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0040DD);">☁️</div><span class="app-name">天氣</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FFCC00, #FFA000);">💡</div><span class="app-name">靈感</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #A259FF, #631BFF);">🎮</div><span class="app-name">遊戲</span></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF0055);">📊</div><span class="app-name">數據</span></div>
+        <div class="app-item" onclick="openApp('相機')"><div class="app-icon" style="background: linear-gradient(135deg, #FF9500, #FF5E00);">📷</div><span class="app-name">相機</span></div>
+        <div class="app-item" onclick="openApp('相簿')"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #008E00);">🖼️</div><span class="app-name">相簿</span></div>
+        <div class="app-item" onclick="openApp('設定')"><div class="app-icon" style="background: linear-gradient(135deg, #5856D6, #3634A3);">⚙️</div><span class="app-name">設定</span></div>
+        <div class="app-item" onclick="openApp('音樂')"><div class="app-icon" style="background: linear-gradient(135deg, #FF2D55, #D10040);">🎵</div><span class="app-name">音樂</span></div>
+        <div class="app-item" onclick="openApp('天氣')"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0040DD);">☁️</div><span class="app-name">天氣</span></div>
+        <div class="app-item" onclick="openApp('靈感')"><div class="app-icon" style="background: linear-gradient(135deg, #FFCC00, #FFA000);">💡</div><span class="app-name">靈感</span></div>
       </div>
     </div>
 
-    <!-- 3. 核心功能：可拉伸展開成 8 個 App 的 Dock 欄 -->
-    <div class="dock-wrapper" id="dock-bar">
+    <!-- 可拉伸 Dock 欄 (包含第一排 4 個，拉伸出第二排 4 個共 8 個) -->
+    <div class="dock-wrapper" id="dock-wrapper">
       <div class="dock-pill"></div>
-      
       <div class="dock-grid">
-        <!-- 預設第一排 4 個 Apps (1 ~ 4) -->
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #119922);">📞</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0055FF);">💬</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #55E0C4, #00A88F);">🌐</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FA114F, #AF002D);">🎧</div></div>
-
-        <!-- 拉伸後顯現的第二排 4 個 Apps (5 ~ 8) -->
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #A259FF, #631BFF);">🚀</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF0055);">🔥</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #4D96FF, #0055FF);">📂</div></div>
-        <div class="app-item"><div class="app-icon" style="background: linear-gradient(135deg, #6BCB77, #109028);">📝</div></div>
+        <!-- 1~4 個固定 App -->
+        <div class="app-item" onclick="openApp('電話')"><div class="app-icon" style="background: linear-gradient(135deg, #34C759, #119922);">📞</div></div>
+        <div class="app-item" onclick="openApp('訊息')"><div class="app-icon" style="background: linear-gradient(135deg, #007AFF, #0055FF);">💬</div></div>
+        <div class="app-item" onclick="openApp('瀏覽器')"><div class="app-icon" style="background: linear-gradient(135deg, #55E0C4, #00A88F);">🌐</div></div>
+        <div class="app-item" onclick="openApp('音樂')"><div class="app-icon" style="background: linear-gradient(135deg, #FA114F, #AF002D);">🎧</div></div>
+        <!-- 5~8 個拉伸顯現 App -->
+        <div class="app-item" onclick="openApp('應用市場')"><div class="app-icon" style="background: linear-gradient(135deg, #A259FF, #631BFF);">🚀</div></div>
+        <div class="app-item" onclick="openApp('遊戲Center')"><div class="app-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF0055);">🔥</div></div>
+        <div class="app-item" onclick="openApp('檔案')"><div class="app-icon" style="background: linear-gradient(135deg, #4D96FF, #0055FF);">📂</div></div>
+        <div class="app-item" onclick="openApp('便籤')"><div class="app-icon" style="background: linear-gradient(135deg, #6BCB77, #109028);">📝</div></div>
       </div>
     </div>
 
     <!-- 底部條 -->
-    <div class="home-bar"></div>
+    <div class="home-bar" onclick="closeApp()"></div>
+
+    <!-- 模擬 App 全螢幕視窗 -->
+    <div class="app-screen" id="app-screen">
+      <div class="app-header">
+        <span id="app-title">App</span>
+        <button class="close-btn" onclick="closeApp()">完成</button>
+      </div>
+      <div class="app-body" id="app-body"></div>
+    </div>
   </div>
 
-  <!-- ==========================================
-       5. 系統手勢與邏輯 Engine
-       ========================================== -->
   <script>
-    const sys = document.getElementById('frx-system');
-    const dock = document.getElementById('dock-bar');
+    const os = document.getElementById('frx-os');
+    const dock = document.getElementById('dock-wrapper');
+    const appScreen = document.getElementById('app-screen');
+    const appTitle = document.getElementById('app-title');
+    const appBody = document.getElementById('app-body');
     const clock = document.getElementById('clock');
-    
-    let startY = 0;
-    let isDragging = false;
+
     let isExpanded = false;
+    let startY = 0;
 
-    // 即時時鐘
-    function updateClock() {
+    // 時鐘
+    setInterval(() => {
       const now = new Date();
-      const hrs = String(now.getHours()).padStart(2, '0');
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      clock.textContent = `${hrs}:${mins}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+      clock.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    }, 1000);
 
-    // 點擊 Dock 觸發拉伸/收合
-    dock.addEventListener('click', (e) => {
-      if (e.target.closest('.app-item')) return;
-      toggleDock();
+    /* 關鍵需求：點擊 Dock 以外的區域自動收回 Dock */
+    document.addEventListener('click', (e) => {
+      // 若點擊目標不屬於 Dock 且不屬於展開按鈕觸發時收回
+      if (!dock.contains(e.target) && isExpanded) {
+        setDockState(false);
+      }
     });
 
-    // 手勢拖拽 (Touch & Mouse)
-    dock.addEventListener('touchstart', onStart, {passive: true});
-    dock.addEventListener('mousedown', onStart);
-
-    window.addEventListener('touchmove', onMove, {passive: true});
-    window.addEventListener('mousemove', onMove);
-
-    window.addEventListener('touchend', onEnd);
-    window.addEventListener('mouseup', onEnd);
-
-    function onStart(e) {
-      startY = e.touches ? e.touches[0].clientY : e.clientY;
-      isDragging = true;
-    }
-
-    function onMove(e) {
-      if (!isDragging) return;
-      const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-      const deltaY = startY - currentY;
-
-      // 向上拉動超過 35px 展開，向下拉動超過 35px 收合
-      if (deltaY > 35 && !isExpanded) {
-        setDock(true);
-        isDragging = false;
-      } else if (deltaY < -35 && isExpanded) {
-        setDock(false);
-        isDragging = false;
+    // 點擊 Dock 指示條或拖曳切換 Dock
+    dock.addEventListener('click', (e) => {
+      e.stopPropagation(); // 阻止冒泡到 document
+      if (!e.target.closest('.app-item')) {
+        setDockState(!isExpanded);
       }
-    }
+    });
 
-    function onEnd() {
-      isDragging = false;
-    }
+    // 手勢支援 (拉伸與收回)
+    dock.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, {passive: true});
+    dock.addEventListener('touchmove', (e) => {
+      const deltaY = startY - e.touches[0].clientY;
+      if (deltaY > 30 && !isExpanded) setDockState(true);
+      if (deltaY < -30 && isExpanded) setDockState(false);
+    }, {passive: true});
 
-    function toggleDock() {
-      setDock(!isExpanded);
-    }
-
-    function setDock(expand) {
+    function setDockState(expand) {
       isExpanded = expand;
       if (isExpanded) {
-        sys.classList.add('dock-active');
+        os.classList.add('dock-active');
       } else {
-        sys.classList.remove('dock-active');
+        os.classList.remove('dock-active');
       }
+    }
+
+    /* 開啟與關閉 App 系統 */
+    function openApp(name) {
+      setDockState(false); // 開啟 App 時自動收回 Dock
+      appTitle.textContent = name;
+      
+      // 根據 App 名稱渲染內部介面
+      if (name === '相機') {
+        appBody.innerHTML = `<div style="text-align:center;"><div style="width:260px;height:340px;background:#222;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:50px;">📷</div><p style="margin-top:20px;">相機已就緒</p></div>`;
+      } else if (name === '設定') {
+        appBody.innerHTML = `<div style="width:100%;max-width:300px;"><div style="padding:15px;background:#222;border-radius:12px;margin-bottom:10px;">深色模式：開啟</div><div style="padding:15px;background:#222;border-radius:12px;">FRX OS 版本：1.0.0</div></div>`;
+      } else if (name === '瀏覽器') {
+        appBody.innerHTML = `<input type="text" value="https://frx-os.internal" style="width:100%;padding:12px;border-radius:10px;border:none;background:#222;color:#fff;margin-bottom:15px;"><div style="flex:1;width:100%;background:#1e1e24;border-radius:12px;display:flex;align-items:center;justify-content:center;">歡迎使用 FRX Web 瀏覽器</div>`;
+      } else {
+        appBody.innerHTML = `<div style="font-size:48px;margin-bottom:10px;">📱</div><h2>${name} App</h2><p style="color:#aaa;margin-top:8px;">FRX OS 1 原生模擬應用程式</p>`;
+      }
+
+      appScreen.classList.add('active');
+    }
+
+    function closeApp() {
+      appScreen.classList.remove('active');
     }
   </script>
 </body>
