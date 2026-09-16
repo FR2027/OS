@@ -1,1 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- iOS PWA 滿版與狀態列適配 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FRX OS">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
 
+  <!-- 修正 Safari 主畫面圖示裁切問題 -->
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZSWCBPUyAxIiwKICAic2hvcnRfbmFtZSI6ICJGUlhPUyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiIzAwMDAwMCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vaS5pYmIuY28vMFJIZ1FKY3cvQmFja2dyb3VuZC1FcmFzZXIucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciLAogICAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgICB9CiAgXQp9">
+
+  <title>FRX OS 1 Ultra Flagship</title>
+
+  <style>
+    :root {
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      --glass-bg: rgba(255, 255, 255, 0.18);
+      --glass-border: rgba(255, 255, 255, 0.28);
+      --glass-blur: blur(35px) saturate(200%);
+      --spring-physics: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
+      --icon-size: 60px;
+      --icon-radius: 16px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: var(--font);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100dvh;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      position: fixed;
+    }
+
+    /* 滿版 OS 系統主容器 */
+    .frx-os {
+      width: 100vw;
+      height: 100dvh;
+      position: relative;
+      background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    /* 頂部狀態列 & 動態島 */
+    .status-bar {
+      height: calc(44px + var(--safe-top));
+      padding: var(--safe-top) 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 800;
+      pointer-events: auto;
+    }
+
+    .dynamic-island {
+      width: 130px;
+      height: 32px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      top: calc(8px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 850;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.8);
+      transition: all 0.35s var(--ease-apple);
+      cursor: pointer;
+      pointer-events: auto;
+      overflow: hidden;
+    }
+    .dynamic-island.expanded {
+      width: 320px;
+      height: 75px;
+      border-radius: 38px;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(20px);
+    }
+    .island-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 8px #34C759; flex-shrink: 0; }
+    .island-content { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #fff; width: 100%; overflow: hidden; white-space: nowrap; }
+
+    /* 桌面區域 */
+    .main-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: calc(10px + var(--safe-top)) 20px calc(130px + var(--safe-bottom));
+      gap: 20px;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+    }
+
+    /* 橫幅 Widget - 圖像置中修復 */
+    .widget-banner {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    }
+    
+    .widget-img-container {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .widget-img-container img {
+      width: 85%;
+      height: 85%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 14px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .app-item:active { transform: scale(0.88); }
+
+    .app-icon {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      border-radius: var(--icon-radius);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      position: relative;
+    }
+
+    .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+
+    /* iOS 長按晃動編輯模式 */
+    @keyframes jiggle {
+      0% { transform: rotate(-1.8deg) scale(1.02); }
+      50% { transform: rotate(1.8deg) scale(0.98); }
+      100% { transform: rotate(-1.8deg) scale(1.02); }
+    }
+    .editing .app-item { animation: jiggle 0.22s infinite ease-in-out; }
+    .remove-btn {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 22px;
+      height: 22px;
+      background: #ff3b30;
+      color: #fff;
+      border-radius: 50%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .editing .remove-btn { display: flex; }
+
+    /* Dock 欄 */
+    .dock-wrapper {
+      position: absolute;
+      bottom: calc(15px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 420px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 38px;
+      padding: 8px 14px 12px;
+      z-index: 700;
+      transition: height 0.42s var(--spring-physics), border-radius 0.3s ease;
+      height: 94px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+
+    .dock-handle {
+      width: 42px;
+      height: 5px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 3px;
+      margin-bottom: 8px;
+      cursor: grab;
+    }
+
+    .dock-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 16px;
+      width: 100%;
+    }
+
+    .dock-wrapper.expanded {
+      height: 184px;
+      border-radius: 42px;
+    }
+
+    /* 全螢幕 App 視窗 */
+    .app-window {
+      position: absolute;
+      inset: 0;
+      background: #121217;
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.85) translateY(100%);
+      opacity: 0;
+      border-radius: 42px;
+      transition: transform 0.45s var(--ease-apple), opacity 0.3s ease, border-radius 0.35s ease;
+      pointer-events: none;
+      overflow: hidden;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+    .app-window.active {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      border-radius: 0px;
+      pointer-events: auto;
+    }
+
+    .app-header {
+      height: 54px;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1c1c24;
+      border-bottom: 1px solid #2c2c38;
+      font-weight: 700;
+    }
+    .app-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
+
+    /* 🛡️ 手勢攔截防護層 (解決地圖/Iframe 蓋過手勢問題) */
+    .gesture-touch-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 995;
+      pointer-events: none; /* 預設穿透 */
+    }
+
+    .edge-gesture-trigger {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 30px;
+      z-index: 998;
+      pointer-events: auto;
+    }
+    .edge-trigger-left { left: 0; }
+    .edge-trigger-right { right: 0; }
+
+    /* Home Bar & 滑動手勢區域 */
+    .home-bar-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: calc(30px + var(--safe-bottom));
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: calc(8px + var(--safe-bottom));
+      pointer-events: auto;
+    }
+    .home-bar {
+      width: 140px;
+      height: 5px;
+      background: #fff;
+      border-radius: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    /* 雙側兩段式手勢膠囊 UI */
+    .gesture-pill {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) scale(0.8);
+      width: 44px;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.28);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 36px;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s, background 0.2s;
+      pointer-events: none;
+    }
+    .gesture-left { left: 12px; }
+    .gesture-right { right: 12px; }
+    .gesture-pill.stage2 { background: #0a84ff; border-color: #64d2ff; transform: translateY(-50%) scale(1.1); }
+
+    /* 控制中心 Overlay */
+    .control-center {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 950;
+      display: flex;
+      flex-direction: column;
+      padding: calc(60px + var(--safe-top)) 20px 40px;
+      transform: translateY(-100%);
+      transition: transform 0.4s var(--ease-apple);
+    }
+    .control-center.active { transform: translateY(0); }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .control-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .control-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+    .control-btn.active { background: #0a84ff; }
+
+    /* 通用 UI 組件 */
+    .settings-group { background: #1c1c24; border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+    .settings-title { font-size: 12px; text-transform: uppercase; color: #8e8e93; margin-bottom: 10px; font-weight: 600; }
+    .setting-input { background: #2c2c38; border: none; padding: 10px 14px; border-radius: 10px; color: #fff; width: 100%; font-size: 14px; outline: none; }
+    .setting-btn { background: #0a84ff; color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    iframe.app-iframe { width: 100%; height: 100%; border: none; flex: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="frx-os" id="frx-os">
+
+    <!-- 頂部狀態列 & 動態島 -->
+    <div class="status-bar" id="status-bar">
+      <span id="clock">21:20</span>
+      <div class="dynamic-island" id="dynamic-island" onclick="toggleIsland()">
+        <div class="island-content" id="island-content">
+          <span id="island-text" style="font-weight:700;">FRX Pro</span>
+        </div>
+        <div class="island-dot"></div>
+      </div>
+      <div><span>5G</span> <span style="margin-left:4px;">100%</span></div>
+    </div>
+
+    <!-- 主畫面內容區 -->
+    <div class="main-screen" id="main-screen">
+      <div class="widget-banner">
+        <div>
+          <h2 style="font-size: 18px;">FRX OS 1 旗艦系統</h2>
+          <p style="font-size: 11px; color: #ccc; margin-top: 2px;">雙側兩段手勢 + 地圖手勢穿透修復</p>
+        </div>
+        <!-- 置中修復圖像容器 -->
+        <div class="widget-img-container">
+          <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" alt="FRX Logo">
+        </div>
+      </div>
+
+      <div class="app-grid" id="app-grid"></div>
+    </div>
+
+    <!-- 可伸縮 Dock 欄 -->
+    <div class="dock-wrapper" id="dock-wrapper">
+      <div class="dock-handle" id="dock-handle" onclick="toggleDock()"></div>
+      <div class="dock-grid" id="dock-grid"></div>
+    </div>
+
+    <!-- 全螢幕 App 視窗 -->
+    <div class="app-window" id="app-window">
+      <div class="app-header">
+        <span id="app-title">App</span>
+        <button style="color:#0a84ff;background:none;border:none;font-weight:600;font-size:14px;cursor:pointer;" onclick="closeApp()">完成</button>
+      </div>
+      <div class="app-body" id="app-body"></div>
+      
+      <!-- 手勢攔截護罩 (防止 Iframe/地圖吃掉側滑手勢) -->
+      <div class="edge-gesture-trigger edge-trigger-left"></div>
+      <div class="edge-gesture-trigger edge-trigger-right"></div>
+    </div>
+
+    <!-- 下滑控制中心 Overlay -->
+    <div class="control-center" id="control-center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2>控制中心</h2>
+        <button onclick="toggleControlCenter()" style="color:#0a84ff;background:none;border:none;font-size:16px;">關閉</button>
+      </div>
+      <div class="control-grid">
+        <div class="control-card">
+          <div class="control-btn active" id="btn-wifi" onclick="toggleControl('wifi')">
+            <span>📶</span> <span>Wi-Fi</span>
+          </div>
+          <div class="control-btn active" id="btn-bt" onclick="toggleControl('bt')">
+            <span>📡</span> <span>藍牙</span>
+          </div>
+        </div>
+        <div class="control-card">
+          <label style="font-size:12px;color:#aaa;">螢幕亮度</label>
+          <input type="range" min="30" max="100" value="100" oninput="adjustBrightness(this.value)" style="width:100%;">
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS 底部 Home Bar 手勢條 -->
+    <div class="home-bar-area" id="home-bar-area">
+      <div class="home-bar"></div>
+    </div>
+
+    <!-- 雙側兩段式手勢指示膠囊 -->
+    <div class="gesture-pill gesture-left" id="gesture-left">‹</div>
+    <div class="gesture-pill gesture-right" id="gesture-right">›</div>
+
+  </div>
+
+  <script>
+    // 完整 App 清單數據
+    const appsData = [
+      { id: 'camera', name: '相機', icon: '📷', bg: 'linear-gradient(135deg, #FF9500, #FF5E00)' },
+      { id: 'photos', name: '相簿', icon: '🖼️', bg: 'linear-gradient(135deg, #34C759, #008E00)' },
+      { id: 'calc', name: '計算機', icon: '🧮', bg: 'linear-gradient(135deg, #FF9F0A, #FF7B00)' },
+      { id: 'settings', name: '設定', icon: '⚙️', bg: 'linear-gradient(135deg, #5856D6, #3634A3)' },
+      { id: 'music', name: '音樂', icon: '🎵', bg: 'linear-gradient(135deg, #FF2D55, #D10040)' },
+      { id: 'weather', name: '天氣', icon: '☁️', bg: 'linear-gradient(135deg, #007AFF, #0040DD)' },
+      { id: 'notes', name: '記事本', icon: '📝', bg: 'linear-gradient(135deg, #FFCC00, #FFA000)' },
+      { id: 'maps', name: '地圖', icon: '🗺️', bg: 'linear-gradient(135deg, #30B0C7, #007AFF)' },
+      { id: 'phone', name: '電話', icon: '📞', bg: 'linear-gradient(135deg, #34C759, #119922)' },
+      { id: 'messages', name: '訊息', icon: '💬', bg: 'linear-gradient(135deg, #007AFF, #0055FF)' },
+      { id: 'browser', name: '瀏覽器', icon: '🌐', bg: 'linear-gradient(135deg, #55E0C4, #00A88F)' },
+      { id: 'clockApp', name: '鬧鐘', icon: '⏰', bg: 'linear-gradient(135deg, #5E5CE6, #3634A3)' }
+    ];
+
+    const os = document.getElementById('frx-os');
+    const appGrid = document.getElementById('app-grid');
+    const dockGrid = document.getElementById('dock-grid');
+    const dockWrapper = document.getElementById('dock-wrapper');
+    const appWindow = document.getElementById('app-window');
+    const appTitle = document.getElementById('app-title');
+    const appBody = document.getElementById('app-body');
+    const clock = document.getElementById('clock');
+    const dynamicIsland = document.getElementById('dynamic-island');
+    const islandContent = document.getElementById('island-content');
+    const controlCenter = document.getElementById('control-center');
+    
+    let isEditing = false;
+    let isMusicPlaying = false;
+    let audioElem = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+
+    // 本地持久化設定
+    let settings = JSON.parse(localStorage.getItem('frx_settings')) || {
+      bgUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000',
+      islandText: 'FRX Pro'
+    };
+
+    function applySettings() {
+      os.style.backgroundImage = `url('${settings.bgUrl}')`;
+      document.getElementById('island-text').textContent = settings.islandText;
+    }
+    applySettings();
+
+    // 渲染桌面與 Dock Apps
+    function renderApps() {
+      appGrid.innerHTML = '';
+      dockGrid.innerHTML = '';
+
+      appsData.slice(0, 8).forEach(app => appGrid.appendChild(createAppElem(app)));
+      appsData.slice(4, 12).forEach(app => dockGrid.appendChild(createAppElem(app, true)));
+    }
+
+    function createAppElem(app, isDock = false) {
+      const item = document.createElement('div');
+      item.className = 'app-item';
+      item.onclick = () => { if (!isEditing) openApp(app.name); };
+
+      let pressTimer;
+      item.ontouchstart = () => { pressTimer = setTimeout(enableEditing, 600); };
+      item.ontouchend = () => clearTimeout(pressTimer);
+
+      item.innerHTML = `
+        <div class="remove-btn" onclick="event.stopPropagation(); removeApp(this)">—</div>
+        <div class="app-icon" style="background:${app.bg};">${app.icon}</div>
+        ${!isDock ? `<span class="app-name">${app.name}</span>` : ''}
+      `;
+      return item;
+    }
+
+    function enableEditing() {
+      isEditing = true;
+      document.body.classList.add('editing');
+    }
+
+    document.getElementById('main-screen').onclick = (e) => {
+      if (e.target.id === 'main-screen' || e.target.className === 'app-grid') {
+        isEditing = false;
+        document.body.classList.remove('editing');
+      }
+    };
+
+    function removeApp(btn) {
+      btn.parentElement.style.transform = 'scale(0)';
+      setTimeout(() => btn.parentElement.remove(), 200);
+    }
+
+    // Dock 拉伸開合
+    function toggleDock() {
+      dockWrapper.classList.toggle('expanded');
+    }
+
+    let dockStartY = 0;
+    dockWrapper.addEventListener('touchstart', (e) => { dockStartY = e.touches[0].clientY; });
+    dockWrapper.addEventListener('touchend', (e) => {
+      const diffY = dockStartY - e.changedTouches[0].clientY;
+      if (diffY > 25) dockWrapper.classList.add('expanded');
+      else if (diffY < -25) dockWrapper.classList.remove('expanded');
+    });
+
+    // 即時時間更新
+    function updateTime() {
+      const now = new Date();
+      clock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // 動態島與控制中心
+    function toggleIsland() {
+      dynamicIsland.classList.toggle('expanded');
+    }
+
+    function setIslandContent(html) {
+      islandContent.innerHTML = html;
+    }
+
+    function toggleControlCenter() {
+      controlCenter.classList.toggle('active');
+    }
+
+    function adjustBrightness(val) {
+      os.style.filter = `brightness(${val}%)`;
+    }
+
+    function toggleControl(type) {
+      const btn = document.getElementById(`btn-${type}`);
+      btn.classList.toggle('active');
+    }
+
+    // 開啟與關閉 App 視窗
+    function openApp(name) {
+      appTitle.textContent = name;
+      appBody.innerHTML = '';
+
+      if (name === '相機') {
+        appBody.innerHTML = `
+          <div style="flex:1;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;">
+            <video id="camera-video" autoplay playsinline style="width:100%;height:70%;object-fit:cover;border-radius:24px;background:#222;"></video>
+            <div style="display:flex;align-items:center;justify-content:space-around;width:100%;padding:20px 0;">
+              <div style="width:50px;"></div>
+              <button onclick="takePhoto()" style="width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:none;cursor:pointer;"></button>
+              <div style="width:50px;"></div>
+            </div>
+          </div>
+        `;
+        startCamera();
+        setIslandContent('🟢 <span>相機使用中</span>');
+
+      } else if (name === '相簿') {
+        renderPhotosApp();
+
+      } else if (name === '計算機') {
+        renderCalcApp();
+
+      } else if (name === '音樂') {
+        renderMusicApp();
+
+      } else if (name === '天氣') {
+        renderWeatherApp();
+
+      } else if (name === '記事本') {
+        renderNotesApp();
+
+      } else if (name === '瀏覽器') {
+        appBody.innerHTML = `
+          <div style="padding:10px;background:#1c1c24;display:flex;gap:8px;align-items:center;">
+            <input type="text" id="browser-url" value="https://duckduckgo.com" class="setting-input">
+            <button onclick="navigateUrl()" class="setting-btn">前往</button>
+          </div>
+          <iframe id="browser-iframe" class="app-iframe" src="https://duckduckgo.com"></iframe>
+        `;
+
+      } else if (name === '地圖') {
+        // 全螢幕地圖 + 防護機制
+        appBody.innerHTML = `<iframe class="app-iframe" src="https://www.openstreetmap.org/export/embed.html?bbox=121.50,25.00,121.58,25.08&layer=mapnik"></iframe>`;
+
+      } else if (name === '電話') {
+        renderPhoneApp();
+
+      } else if (name === '訊息') {
+        renderMessagesApp();
+
+      } else if (name === '鬧鐘') {
+        renderClockApp();
+
+      } else if (name === '設定') {
+        renderSettingsApp();
+      }
+
+      appWindow.classList.add('active');
+    }
+
+    function closeApp() {
+      appWindow.classList.remove('active');
+      stopCamera();
+      if (!isMusicPlaying) {
+        setIslandContent(`<span id="island-text" style="font-weight:700;">${settings.islandText}</span>`);
+      }
+    }
+
+    /* --- Apps 核心功能實現 --- */
+
+    let videoStream = null;
+    async function startCamera() {
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        const video = document.getElementById('camera-video');
+        if (video) video.srcObject = videoStream;
+      } catch (err) {
+        alert('請允許相機存取權限以進行拍照');
+      }
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+      }
+    }
+
+    function takePhoto() {
+      const video = document.getElementById('camera-video');
+      if (!video) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      photos.unshift(dataUrl);
+      localStorage.setItem('frx_photos', JSON.stringify(photos));
+      alert('📸 照片已成功拍攝並寫入相簿！');
+    }
+
+    function renderPhotosApp() {
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      appBody.innerHTML = `
+        <div style="padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          ${photos.map((p, idx) => `
+            <div style="position:relative;height:110px;">
+              <img src="${p}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+              <button onclick="deletePhoto(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;">✕</button>
+            </div>
+          `).join('')}
+          ${photos.length === 0 ? '<p style="grid-column:span 3;text-align:center;color:#8e8e93;margin-top:40px;">尚無照片，請使用相機 App 拍照</p>' : ''}
+        </div>
+      `;
+    }
+
+    function deletePhoto(idx) {
+      const photos = JSON.parse(localStorage.getItem('frx_photos')) || [];
+      photos.splice(idx, 1);
+      localStorage.setItem('frx_photos', JSON.stringify(photos));
+      renderPhotosApp();
+    }
+
+    let calcExpr = '0';
+    function renderCalcApp() {
+      appBody.innerHTML = `
+        <div style="margin:auto;width:100%;max-width:320px;padding:20px;display:flex;flex-direction:column;height:100%;justify-content:flex-end;">
+          <div id="calc-res" style="font-size:48px;text-align:right;margin-bottom:20px;word-break:break-all;font-weight:300;">${calcExpr}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <button onclick="pressCalc('C')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:22px;font-weight:600;">C</button>
+            <button onclick="pressCalc('+/-')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:20px;font-weight:600;">±</button>
+            <button onclick="pressCalc('%')" style="height:65px;border-radius:50%;border:none;background:#a5a5a5;color:#000;font-size:20px;font-weight:600;">%</button>
+            <button onclick="pressCalc('/')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">÷</button>
+            
+            <button onclick="pressCalc('7')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">7</button>
+            <button onclick="pressCalc('8')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">8</button>
+            <button onclick="pressCalc('9')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">9</button>
+            <button onclick="pressCalc('*')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">×</button>
+            
+            <button onclick="pressCalc('4')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">4</button>
+            <button onclick="pressCalc('5')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">5</button>
+            <button onclick="pressCalc('6')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">6</button>
+            <button onclick="pressCalc('-')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">-</button>
+            
+            <button onclick="pressCalc('1')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">1</button>
+            <button onclick="pressCalc('2')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">2</button>
+            <button onclick="pressCalc('3')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">3</button>
+            <button onclick="pressCalc('+')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">+</button>
+            
+            <button onclick="pressCalc('0')" style="height:65px;border-radius:35px;border:none;background:#333;color:#fff;font-size:22px;grid-column:span 2;text-align:left;padding-left:25px;">0</button>
+            <button onclick="pressCalc('.')" style="height:65px;border-radius:50%;border:none;background:#333;color:#fff;font-size:22px;">.</button>
+            <button onclick="pressCalc('=')" style="height:65px;border-radius:50%;border:none;background:#ff9f0a;color:#fff;font-size:24px;">=</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function pressCalc(v) {
+      const res = document.getElementById('calc-res');
+      if (v === 'C') {
+        calcExpr = '0';
+      } else if (v === '=') {
+        try {
+          calcExpr = String(Function(`'use strict'; return (${calcExpr})`)());
+        } catch {
+          calcExpr = 'Error';
+        }
+      } else if (v === '+/-') {
+        calcExpr = calcExpr.startsWith('-') ? calcExpr.slice(1) : '-' + calcExpr;
+      } else if (v === '%') {
+        calcExpr = String(parseFloat(calcExpr) / 100);
+      } else {
+        calcExpr = (calcExpr === '0' || calcExpr === 'Error') ? v : calcExpr + v;
+      }
+      if (res) res.textContent = calcExpr;
+    }
+
+    function renderMusicApp() {
+      appBody.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;">
+          <div style="width:200px;height:200px;background:linear-gradient(135deg, #FF2D55, #5856D6);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;box-shadow:0 15px 35px rgba(255,45,85,0.4);margin-bottom:30px;">
+            🎵
+          </div>
+          <h2 style="font-size:22px;margin-bottom:6px;">FRX Ultra Beats</h2>
+          <p style="color:#8e8e93;font-size:14px;margin-bottom:30px;">SoundHelix Demo Track</p>
+          
+          <button onclick="togglePlayMusic()" style="width:70px;height:70px;border-radius:50%;background:#0a84ff;color:#fff;border:none;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(10,132,255,0.4);">
+            ${isMusicPlaying ? '⏸' : '▶'}
+          </button>
+        </div>
+      `;
+    }
+
+    function togglePlayMusic() {
+      if (isMusicPlaying) {
+        audioElem.pause();
+        isMusicPlaying = false;
+        setIslandContent(`<span id="island-text" style="font-weight:700;">${settings.islandText}</span>`);
+      } else {
+        audioElem.play();
+        isMusicPlaying = true;
+        setIslandContent('🎵 <span style="color:#FF2D55;font-weight:bold;">播放中: FRX Ultra Beats</span>');
+      }
+      renderMusicApp();
+    }
+
+    function renderWeatherApp() {
+      appBody.innerHTML = `
+        <div style="padding:24px;display:flex;flex-direction:column;align-items:center;">
+          <h2 style="font-size:28px;">台北市</h2>
+          <div style="font-size:72px;font-weight:200;margin:10px 0;">26°</div>
+          <p style="font-weight:600;color:#8e8e93;margin-bottom:20px;">多雲時晴</p>
+          <div style="width:100%;background:#1c1c24;border-radius:16px;padding:16px;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2c2c38;">
+              <span>今天</span><span>⛅ 26° / 21°</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2c2c38;">
+              <span>明天</span><span>🌧️ 24° / 20°</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span>後天</span><span>☀️ 28° / 22°</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderNotesApp() {
+      const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="note-input" placeholder="新增筆記..." class="setting-input">
+            <button onclick="addNote()" class="setting-btn">儲存</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${notes.map((n, i) => `
+              <div style="background:#1c1c24;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+                <span>${n}</span>
+                <button onclick="deleteNote(${i})" style="background:none;border:none;color:#ff3b30;cursor:pointer;font-weight:bold;">刪除</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function addNote() {
+      const inp = document.getElementById('note-input');
+      if (inp && inp.value.trim()) {
+        const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+        notes.unshift(inp.value.trim());
+        localStorage.setItem('frx_notes', JSON.stringify(notes));
+        renderNotesApp();
+      }
+    }
+
+    function deleteNote(i) {
+      const notes = JSON.parse(localStorage.getItem('frx_notes')) || [];
+      notes.splice(i, 1);
+      localStorage.setItem('frx_notes', JSON.stringify(notes));
+      renderNotesApp();
+    }
+
+    let dialNum = '';
+    function renderPhoneApp() {
+      appBody.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;align-items:center;">
+          <div id="dial-display" style="font-size:36px;height:50px;margin-bottom:20px;font-weight:300;">${dialNum}</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:280px;margin-bottom:20px;">
+            ${['1','2','3','4','5','6','7','8','9','*','0','#'].map(n => `
+              <button onclick="pressDial('${n}')" style="height:65px;border-radius:50%;background:#2c2c38;color:#fff;border:none;font-size:24px;">${n}</button>
+            `).join('')}
+          </div>
+          <button onclick="makeCall()" style="width:65px;height:65px;border-radius:50%;background:#34c759;color:#fff;border:none;font-size:28px;">📞</button>
+        </div>
+      `;
+    }
+
+    function pressDial(n) {
+      dialNum += n;
+      const d = document.getElementById('dial-display');
+      if (d) d.textContent = dialNum;
+    }
+
+    function makeCall() {
+      if (dialNum) {
+        alert('📞 正在撥打給: ' + dialNum);
+        dialNum = '';
+        renderPhoneApp();
+      }
+    }
+
+    function renderMessagesApp() {
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#1c1c24;padding:14px;border-radius:16px;">
+            <strong style="color:#0a84ff;">FRX 客服助手</strong>
+            <p style="margin-top:4px;color:#ccc;font-size:14px;">歡迎使用 FRX OS 1 旗艦系統！</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderClockApp() {
+      appBody.innerHTML = `
+        <div style="padding:20px;text-align:center;">
+          <h2 style="font-size:48px;font-weight:200;" id="clock-big">00:00:00</h2>
+          <p style="color:#8e8e93;margin-top:8px;">世界標準時間 (Local)</p>
+        </div>
+      `;
+      setInterval(() => {
+        const d = new Date();
+        const elem = document.getElementById('clock-big');
+        if (elem) elem.textContent = d.toTimeString().split(' ')[0];
+      }, 1000);
+    }
+
+    function renderSettingsApp() {
+      appBody.innerHTML = `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="padding:16px;background:#1c1c24;border-radius:16px;text-align:center;">
+            <img src="https://i.ibb.co/0RHgQJcw/Background-Eraser.png" style="width:50px;height:50px;object-fit:contain;margin-bottom:8px;">
+            <h3>FRX OS 1 旗艦客製化中心</h3>
+            <p style="font-size:12px;color:#8e8e93;margin-top:4px;">全功能模擬版</p>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-title">🎨 桌布設定</div>
+            <input type="text" id="cfg-bg-url" class="setting-input" value="${settings.bgUrl}" placeholder="圖片 URL">
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="setting-btn" style="flex:1;" onclick="updateBgUrl()">套用網址</button>
+              <label class="setting-btn" style="background:#34c759;cursor:pointer;">
+                上傳照片
+                <input type="file" accept="image/*" style="display:none;" onchange="uploadLocalBg(event)">
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-title">🏝️ 動態島標題</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="cfg-island-text" class="setting-input" value="${settings.islandText}">
+              <button class="setting-btn" onclick="updateIslandText()">更新</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function navigateUrl() {
+      let url = document.getElementById('browser-url').value;
+      if (!url.startsWith('http')) url = 'https://' + url;
+      document.getElementById('browser-iframe').src = url;
+    }
+
+    function updateBgUrl() {
+      const url = document.getElementById('cfg-bg-url').value;
+      if (url) {
+        settings.bgUrl = url;
+        localStorage.setItem('frx_settings', JSON.stringify(settings));
+        applySettings();
+        alert('✨ 桌布套用成功！');
+      }
+    }
+
+    function uploadLocalBg(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          settings.bgUrl = evt.target.result;
+          localStorage.setItem('frx_settings', JSON.stringify(settings));
+          applySettings();
+          alert('🖼️ 照片已成功設定為桌布！');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateIslandText() {
+      const txt = document.getElementById('cfg-island-text').value;
+      if (txt) {
+        settings.islandText = txt;
+        localStorage.setItem('frx_settings', JSON.stringify(settings));
+        applySettings();
+      }
+    }
+
+    // 🌟 雙側兩段式手勢與地圖手勢修復 (全域 Event Listener)
+    let touchStartX = 0, touchStartY = 0;
+    const gLeft = document.getElementById('gesture-left');
+    const gRight = document.getElementById('gesture-right');
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = currentX - touchStartX;
+      const diffY = currentY - touchStartY;
+
+      // 側邊兩段式手勢檢測
+      if (touchStartX < 40 && diffX > 0) {
+        gLeft.style.opacity = '1';
+        if (diffX > 130) {
+          gLeft.classList.add('stage2');
+          gLeft.innerHTML = '⌂'; // 第二段：返回主畫面
+        } else {
+          gLeft.classList.remove('stage2');
+          gLeft.innerHTML = '‹'; // 第一段：上一頁
+        }
+      } else if (touchStartX > window.innerWidth - 40 && diffX < 0) {
+        gRight.style.opacity = '1';
+        if (Math.abs(diffX) > 130) {
+          gRight.classList.add('stage2');
+          gRight.innerHTML = '⌂';
+        } else {
+          gRight.classList.remove('stage2');
+          gRight.innerHTML = '›';
+        }
+      }
+
+      // 頂部右側下滑喚出控制中心
+      if (touchStartY < 50 && touchStartX > window.innerWidth - 100 && diffY > 60) {
+        toggleControlCenter();
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - touchStartX;
+      const diffY = touchStartY - e.changedTouches[0].clientY;
+
+      gLeft.style.opacity = '0';
+      gRight.style.opacity = '0';
+
+      // 側滑釋放邏輯
+      if ((touchStartX < 40 && diffX > 50) || (touchStartX > window.innerWidth - 40 && diffX < -50)) {
+        if (Math.abs(diffX) > 130) {
+          closeApp(); // 第二段直接返回主畫面
+        } else {
+          const iframe = document.getElementById('browser-iframe');
+          if (iframe && iframe.contentWindow) {
+            try { iframe.contentWindow.history.back(); } catch(e){}
+          } else {
+            closeApp();
+          }
+        }
+      }
+
+      // 底部 Home Bar 上滑返回主畫面
+      if (touchStartY > window.innerHeight - 60 && diffY > 50) {
+        closeApp();
+      }
+    }, { passive: true });
+
+    renderApps();
+  </script>
+</body>
+</html>
