@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FRX OS Quantum">
+  <meta name="apple-mobile-web-app-title" content="FRX OS 5.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
 
-  <title>FRX OS 4.0 Quantum Infinite Edition</title>
+  <title>FRX OS 5.0 Quantum Ultimate Edition</title>
 
   <style>
     :root {
       --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
       --glass-bg: rgba(255, 255, 255, 0.16);
       --glass-border: rgba(255, 255, 255, 0.28);
-      --glass-blur: blur(45px) saturate(210%);
+      --glass-blur: blur(40px) saturate(210%);
       --spring-physics: cubic-bezier(0.175, 0.885, 0.32, 1.275);
       --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
       --icon-size: 66px;
@@ -59,7 +59,7 @@
       transition: filter 0.3s ease;
     }
 
-    /* 狀態列與動態島 */
+    /* 頂部狀態列與動態島 */
     .status-bar {
       height: calc(44px + var(--safe-top));
       padding-top: var(--safe-top);
@@ -75,8 +75,8 @@
     }
 
     .dynamic-island {
-      width: 130px;
-      height: 34px;
+      width: 126px;
+      height: 32px;
       background: #000;
       border-radius: 20px;
       position: absolute;
@@ -94,17 +94,17 @@
       overflow: hidden;
     }
     .dynamic-island.expanded {
-      width: 320px;
-      height: 75px;
-      border-radius: 38px;
-      padding: 12px 20px;
-      background: rgba(0, 0, 0, 0.94);
+      width: 300px;
+      height: 70px;
+      border-radius: 36px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.95);
       backdrop-filter: blur(25px);
     }
     .island-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; }
-    .island-content { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #fff; width: 100%; overflow: hidden; white-space: nowrap; }
+    .island-content { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #fff; width: 100%; overflow: hidden; white-space: nowrap; }
 
-    /* 桌面視窗容器 */
+    /* 桌面視窗 */
     .desktop-viewport {
       flex: 1;
       width: 100%;
@@ -133,7 +133,7 @@
     .app-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px 14px;
+      gap: 22px 14px;
     }
 
     .app-item {
@@ -160,21 +160,22 @@
     }
     .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,0.85); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 
-    /* 編輯模式抖動 */
+    /* iOS 抖動編輯模式 */
     @keyframes jiggle {
-      0% { transform: rotate(-2.5deg) scale(1.02); }
-      50% { transform: rotate(2.5deg) scale(0.98); }
-      100% { transform: rotate(-2.5deg) scale(1.02); }
+      0% { transform: rotate(-2.2deg) scale(1.02); }
+      50% { transform: rotate(2.2deg) scale(0.98); }
+      100% { transform: rotate(-2.2deg) scale(1.02); }
     }
     .editing .app-item { animation: jiggle 0.22s infinite ease-in-out; }
     .remove-btn {
-      position: absolute; top: -6px; left: -6px; width: 22px; height: 22px;
-      background: #ff3b30; color: #fff; border-radius: 50%; display: none;
+      position: absolute; top: -6px; left: -6px; width: 24px; height: 24px;
+      background: rgba(255, 59, 48, 0.9); color: #fff; border-radius: 50%; display: none;
       justify-content: center; align-items: center; font-size: 14px; font-weight: bold; z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
     .editing .remove-btn { display: flex; }
 
-    /* 頁碼指示點 */
+    /* 頁碼點 */
     .page-dots {
       position: absolute;
       bottom: calc(125px + var(--safe-bottom));
@@ -187,7 +188,7 @@
     .page-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: all 0.3s ease; }
     .page-dot.active { width: 18px; border-radius: 3px; background: #fff; }
 
-    /* Dock 底部列 (支援拉伸展開 8 個 App) */
+    /* Dock 底部列 (支援往上拉伸 4 變 8 個 App) */
     .dock-wrapper {
       position: absolute;
       bottom: calc(15px + var(--safe-bottom));
@@ -208,10 +209,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
     .dock-handle { width: 44px; height: 5px; background: rgba(255,255,255,0.6); border-radius: 3px; margin-bottom: 8px; cursor: pointer; }
     .dock-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 16px; width: 100%; }
-    .dock-wrapper.expanded { height: 194px; border-radius: 42px; }
+    .dock-wrapper.expanded { height: 196px; border-radius: 42px; }
 
     /* 獨立 App 執行視窗 */
     .app-window {
@@ -242,6 +244,15 @@
     }
     .app-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
 
+    /* 左側滑動選單 (呼叫選單) */
+    .edge-menu {
+      position: absolute; top: 0; left: 0; width: 280px; height: 100%;
+      background: rgba(20, 20, 28, 0.95); backdrop-filter: blur(40px);
+      z-index: 980; transform: translateX(-100%); transition: transform 0.35s var(--ease-apple);
+      padding: calc(60px + var(--safe-top)) 20px 40px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .edge-menu.active { transform: translateX(0); }
+
     /* 控制中心 */
     .control-center {
       position: absolute; inset: 0; background: rgba(0, 0, 0, 0.78);
@@ -256,16 +267,7 @@
     .control-btn { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.1); padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 600; }
     .control-btn.active { background: #0a84ff; }
 
-    /* 左側滑動捷徑選單 */
-    .edge-menu {
-      position: absolute; top: 0; left: 0; width: 280px; height: 100%;
-      background: rgba(20, 20, 28, 0.95); backdrop-filter: blur(40px);
-      z-index: 980; transform: translateX(-100%); transition: transform 0.35s var(--ease-apple);
-      padding: calc(60px + var(--safe-top)) 20px 40px; display: flex; flex-direction: column; gap: 16px;
-    }
-    .edge-menu.active { transform: translateX(0); }
-
-    /* 底部 Home Bar */
+    /* Home Bar 底部指示條 */
     .home-bar-area {
       position: absolute; bottom: 0; left: 0; width: 100%; height: calc(30px + var(--safe-bottom));
       z-index: 999; display: flex; justify-content: center; align-items: flex-end;
@@ -277,7 +279,7 @@
     .settings-title { font-size: 12px; text-transform: uppercase; color: #8e8e93; margin-bottom: 10px; font-weight: 600; }
     .setting-input { background: #2c2c38; border: none; padding: 12px 14px; border-radius: 12px; color: #fff; width: 100%; font-size: 14px; outline: none; }
     .setting-btn { background: #0a84ff; color: #fff; border: none; padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
-    iframe.app-iframe { width: 100%; height: 100%; border: none; flex: 1; }
+    iframe.app-iframe { width: 100%; height: 100%; border: none; flex: 1; background: #fff; }
 
     .store-item {
       display: flex; align-items: center; justify-content: space-between;
@@ -293,9 +295,9 @@
 
     <!-- 狀態列 -->
     <div class="status-bar" id="status-bar">
-      <span id="clock">22:12</span>
+      <span id="clock">22:15</span>
       <div class="dynamic-island" id="dynamic-island" onclick="toggleIsland()">
-        <div class="island-content"><span id="island-text" style="font-weight:700;">FRX Quantum OS</span></div>
+        <div class="island-content"><span id="island-text" style="font-weight:700;">FRX Quantum</span></div>
         <div class="island-dot"></div>
       </div>
       <div onclick="toggleControlCenter()" style="cursor:pointer;"><span id="net-status">5G</span> <span id="battery-status">100%</span></div>
@@ -316,8 +318,8 @@
       <div class="page-dot" onclick="goToPage(2)"></div>
     </div>
 
-    <!-- Dock (往上拉伸顯示 8 個 App) -->
-    <div class="dock-wrapper" id="dock-wrapper">
+    <!-- Dock 底部列 (支援往上拉伸 4 變 8 個 App) -->
+    <div class="dock-wrapper" id="dock-wrapper" ontouchstart="handleDockTouchStart(event)" ontouchmove="handleDockTouchMove(event)">
       <div class="dock-handle" onclick="toggleDock(event)"></div>
       <div class="dock-grid" id="dock-grid"></div>
     </div>
@@ -331,7 +333,7 @@
       <div class="app-body" id="app-body"></div>
     </div>
 
-    <!-- 左側邊緣滑動選單 -->
+    <!-- 左側邊緣滑動選單 (呼叫選單) -->
     <div class="edge-menu" id="edge-menu">
       <h2 style="font-size:22px;margin-bottom:10px;">⚡ 系統捷徑選單</h2>
       <button class="setting-btn" onclick="toggleControlCenter(); toggleEdgeMenu();">控制中心</button>
@@ -362,7 +364,12 @@
   </div>
 
   <script>
-    /* 500+ App 資料庫與 460+ 下載商店應用 */
+    /* 震動反饋模擬器 (支援手機震動 API) */
+    function vibrate(pattern = 15) {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    }
+
+    /* 內建 App 清單 */
     const baseApps = [
       { id: 'appstore', name: 'App 商店', icon: '🛍️', bg: 'linear-gradient(135deg, #007AFF, #00C7BE)' },
       { id: 'settings', name: '設定', icon: '⚙', bg: 'linear-gradient(135deg, #5856D6, #3634A3)' },
@@ -398,7 +405,7 @@
 
     const storeApps = [];
     const emojis = ['🚀', '⚡', '🔥', '💎', '🛡️', '📦', '🔮', '🎯', '💡', '🧪', '🧩', '🏆', '⭐', '🎧', '💻', '📈'];
-    for (let i = 1; i <= 460; i++) {
+    for (let i = 1; i <= 400; i++) {
       storeApps.push({
         id: `store_app_${i}`,
         name: `Quantum App ${i}`,
@@ -408,8 +415,8 @@
       });
     }
 
-    let installedApps = JSON.parse(localStorage.getItem('frx_installed_apps_4')) || baseApps;
-    let settings = JSON.parse(localStorage.getItem('frx_settings_4')) || {
+    let installedApps = JSON.parse(localStorage.getItem('frx_installed_apps_5')) || baseApps;
+    let settings = JSON.parse(localStorage.getItem('frx_settings_5')) || {
       bgUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000',
       islandText: 'FRX Quantum'
     };
@@ -424,7 +431,7 @@
     }
     applySettings();
 
-    /* 渲染桌面 */
+    /* 渲染桌面與 Dock */
     function renderDesktop() {
       for (let i = 0; i < 3; i++) {
         document.getElementById(`app-grid-${i}`).innerHTML = '';
@@ -451,9 +458,9 @@
       };
       
       let timer;
-      item.ontouchstart = () => { timer = setTimeout(enableEditing, 600); };
+      item.ontouchstart = () => { timer = setTimeout(() => { enableEditing(); }, 500); };
       item.ontouchend = () => clearTimeout(timer);
-      item.onmousedown = () => { timer = setTimeout(enableEditing, 600); };
+      item.onmousedown = () => { timer = setTimeout(() => { enableEditing(); }, 500); };
       item.onmouseup = () => clearTimeout(timer);
 
       item.innerHTML = `
@@ -466,12 +473,14 @@
 
     function enableEditing() {
       isEditing = true;
+      vibrate([30, 50, 30]);
       document.body.classList.add('editing');
     }
 
     function removeApp(id) {
+      vibrate(20);
       installedApps = installedApps.filter(a => a.id !== id);
-      localStorage.setItem('frx_installed_apps_4', JSON.stringify(installedApps));
+      localStorage.setItem('frx_installed_apps_5', JSON.stringify(installedApps));
       renderDesktop();
     }
 
@@ -482,7 +491,12 @@
       }
     }
 
-    /* 頂級多維度手勢系統 (仿 iOS + 安卓側滑返回與選單) */
+    /* 精準手勢系統：
+       - 左側邊緣往右滑：
+         - 短滑：回上一頁 (關閉 App)
+         - 長滑 (>120px) 且伴隨斜向：跳出左側捷徑選單
+       - 長距離右滑：返回主畫面
+    */
     let touchStartX = 0, touchStartY = 0;
     window.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
@@ -493,39 +507,36 @@
       let diffX = e.changedTouches[0].clientX - touchStartX;
       let diffY = e.changedTouches[0].clientY - touchStartY;
 
-      // 如果從螢幕極左側 (X < 45px) 往右滑
-      if (touchStartX < 45 && diffX > 60) {
-        if (Math.abs(diffY) > 80 && diffX > 140) {
-          // 斜向滑動或超長距離叫出左側選單
+      // 從左側邊緣 (X < 45px) 往右滑
+      if (touchStartX < 45 && diffX > 50) {
+        vibrate(25);
+        if (Math.abs(diffY) > 80 && diffX > 120) {
+          // 斜向滑動大動作 -> 叫出左側功能選單
           toggleEdgeMenu();
-        } else if (diffX > 130) {
-          // 長距離右滑返回主畫面
+        } else if (diffX > 140) {
+          // 長距離右滑 -> 回主畫面
           closeApp();
           if (isDockExpanded) { isDockExpanded = false; document.getElementById('dock-wrapper').classList.remove('expanded'); renderDesktop(); }
         } else {
-          // 短距離右滑返回上一頁
-          goBackHistory();
+          // 短滑 -> 返回上一頁
+          closeApp();
         }
       }
     });
 
     function toggleEdgeMenu() {
+      vibrate(30);
       document.getElementById('edge-menu').classList.toggle('active');
     }
 
-    function goBackHistory() {
-      if (document.getElementById('app-window').classList.contains('active')) {
-        closeApp();
-      }
-    }
-
-    /* 換頁與 Dock 互動 */
+    /* 換頁與 Dock 彈性拉伸控制 */
     const viewport = document.getElementById('desktop-viewport');
     let startX = 0;
     viewport.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
     viewport.addEventListener('touchend', (e) => {
       let diff = e.changedTouches[0].clientX - startX;
       if (Math.abs(diff) > 50) {
+        vibrate(10);
         if (diff > 0 && currentPage > 0) currentPage--;
         else if (diff < 0 && currentPage < 2) currentPage++;
         document.getElementById('desktop-container').style.transform = `translateX(-${currentPage * 100}vw)`;
@@ -534,6 +545,7 @@
     });
 
     function goToPage(p) {
+      vibrate(10);
       currentPage = p;
       document.getElementById('desktop-container').style.transform = `translateX(-${currentPage * 100}vw)`;
       updatePageDots();
@@ -544,14 +556,33 @@
       for (let i = 0; i < dots.length; i++) dots[i].className = i === currentPage ? 'page-dot active' : 'page-dot';
     }
 
+    let dockStartY = 0;
+    function handleDockTouchStart(e) { dockStartY = e.touches[0].clientY; }
+    function handleDockTouchMove(e) {
+      let diffY = dockStartY - e.touches[0].clientY;
+      if (diffY > 40 && !isDockExpanded) {
+        isDockExpanded = true;
+        vibrate(30);
+        document.getElementById('dock-wrapper').classList.add('expanded');
+        renderDesktop();
+      } else if (diffY < -40 && isDockExpanded) {
+        isDockExpanded = false;
+        vibrate(20);
+        document.getElementById('dock-wrapper').classList.remove('expanded');
+        renderDesktop();
+      }
+    }
+
     function toggleDock(e) {
       e.stopPropagation();
       isDockExpanded = !isDockExpanded;
+      vibrate(25);
       document.getElementById('dock-wrapper').classList.toggle('expanded', isDockExpanded);
       renderDesktop();
     }
 
     function handleHomeBarClick() {
+      vibrate(20);
       if (isDockExpanded) {
         isDockExpanded = false;
         document.getElementById('dock-wrapper').classList.remove('expanded');
@@ -561,16 +592,16 @@
       }
     }
 
-    /* 時鐘與控制中心 */
+    /* 時鐘與系統狀態 */
     setInterval(() => {
       const now = new Date();
       document.getElementById('clock').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }, 1000);
 
-    function toggleIsland() { document.getElementById('dynamic-island').classList.toggle('expanded'); }
-    function toggleControlCenter() { document.getElementById('control-center').classList.toggle('active'); }
+    function toggleIsland() { vibrate(15); document.getElementById('dynamic-island').classList.toggle('expanded'); }
+    function toggleControlCenter() { vibrate(20); document.getElementById('control-center').classList.toggle('active'); }
     function adjustBrightness(val) { document.getElementById('frx-os').style.filter = `brightness(${val}%)`; }
-    function toggleControl(t) { document.getElementById(`btn-${t}`).classList.toggle('active'); }
+    function toggleControl(t) { vibrate(15); document.getElementById(`btn-${t}`).classList.toggle('active'); }
 
     /* App 視窗系統 */
     const appWindow = document.getElementById('app-window');
@@ -578,6 +609,7 @@
     const appBody = document.getElementById('app-body');
 
     function openApp(name, id) {
+      vibrate(20);
       appTitle.textContent = name;
       appBody.innerHTML = '';
 
@@ -596,16 +628,16 @@
       else if (id === 'browser') {
         appBody.innerHTML = `<div style="padding:10px;background:#1c1c24;display:flex;gap:8px;"><input type="text" id="b-url" value="https://duckduckgo.com" class="setting-input"><button onclick="navUrl()" class="setting-btn">前往</button></div><iframe id="b-frame" class="app-iframe" src="https://duckduckgo.com"></iframe>`;
       } else {
-        appBody.innerHTML = `<div style="padding:40px;text-align:center;"><h2>${name}</h2><p style="color:#8e8e93;margin-top:10px;">FRX Quantum 完整原生應用程式運行中。</p></div>`;
+        appBody.innerHTML = `<div style="padding:40px;text-align:center;"><h2>${name}</h2><p style="color:#8e8e93;margin-top:10px;">FRX Quantum 核心模組順暢運行中。</p></div>`;
       }
       appWindow.classList.add('active');
     }
 
-    function closeApp() { appWindow.classList.remove('active'); }
+    function closeApp() { vibrate(15); appWindow.classList.remove('active'); }
 
-    /* App 商店實作 */
+    /* 應用商店 */
     function renderAppStore() {
-      appBody.innerHTML = `<div style="padding:16px;"><h2 style="font-size:22px;margin-bottom:14px;">🛍️ 應用商店 (500+ App)</h2><div id="store-list" style="display:flex;flex-direction:column;gap:10px;"></div></div>`;
+      appBody.innerHTML = `<div style="padding:16px;"><h2 style="font-size:22px;margin-bottom:14px;">🛍️ 應用商店 (400+ App)</h2><div id="store-list" style="display:flex;flex-direction:column;gap:10px;"></div></div>`;
       const list = document.getElementById('store-list');
       storeApps.forEach(app => {
         const installed = installedApps.some(a => a.id === app.id);
@@ -622,14 +654,15 @@
     function installApp(id) {
       const app = storeApps.find(a => a.id === id);
       if (app && !installedApps.some(a => a.id === id)) {
+        vibrate(30);
         installedApps.push(app);
-        localStorage.setItem('frx_installed_apps_4', JSON.stringify(installedApps));
+        localStorage.setItem('frx_installed_apps_5', JSON.stringify(installedApps));
         renderAppStore();
         renderDesktop();
       }
     }
 
-    /* 設定 App (支援本機桌布上傳) */
+    /* 設定與桌布上傳 */
     function renderSettingsApp() {
       appBody.innerHTML = `
         <div style="padding:16px;display:flex;flex-direction:column;gap:16px;">
@@ -652,7 +685,7 @@
         const reader = new FileReader();
         reader.onload = (ev) => {
           settings.bgUrl = ev.target.result;
-          localStorage.setItem('frx_settings_4', JSON.stringify(settings));
+          localStorage.setItem('frx_settings_5', JSON.stringify(settings));
           applySettings();
           alert('✨ 桌布上傳成功！');
         };
@@ -664,13 +697,13 @@
       const val = document.getElementById('cfg-island').value;
       if (val) {
         settings.islandText = val;
-        localStorage.setItem('frx_settings_4', JSON.stringify(settings));
+        localStorage.setItem('frx_settings_5', JSON.stringify(settings));
         applySettings();
         alert('✨ 動態島更新成功！');
       }
     }
 
-    /* 相機 App 實作 */
+    /* 相機實作 */
     function renderCameraApp() {
       appBody.innerHTML = `
         <div style="position:relative;width:100%;height:100%;background:#000;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:20px;">
@@ -690,14 +723,15 @@
       });
     }
 
-    function takeSnapshot() { alert('📸 照片已成功拍攝並儲存至相簿！'); }
+    function takeSnapshot() { vibrate(40); alert('📸 照片已成功拍攝並儲存至相簿！'); }
 
-    /* 其他實用小工具 */
+    /* 其他功能模組 */
     let calcStr = '0';
     function renderCalcApp() {
       appBody.innerHTML = `<div style="margin:auto;width:100%;max-width:320px;padding:20px;"><div id="c-res" style="font-size:46px;text-align:right;margin-bottom:20px;font-weight:300;">${calcStr}</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">${['C','/','*','-','7','8','9','+','4','5','6','=','1','2','3','0'].map(b=>`<button onclick="pressC('${b}')" style="height:60px;border-radius:30px;border:none;background:#2c2c38;color:#fff;font-size:20px;font-weight:600;cursor:pointer;">${b}</button>`).join('')}</div></div>`;
     }
     function pressC(v) {
+      vibrate(10);
       if (v==='C') calcStr='0';
       else if (v==='=') { try { calcStr = String(eval(calcStr)); } catch { calcStr='Error'; } }
       else calcStr = calcStr==='0'?v:calcStr+v;
@@ -710,14 +744,15 @@
       appBody.innerHTML = `<div style="margin:auto;text-align:center;padding:40px;"><div style="font-size:70px;margin-bottom:20px;">🎵</div><h2 style="font-size:22px;">FRX Music Quantum</h2><p style="color:#8e8e93;margin-top:8px;">High Quality Audio Engine</p><button onclick="toggleMusic()" style="margin-top:30px;padding:14px 32px;background:#0a84ff;color:#fff;border:none;border-radius:24px;font-size:16px;font-weight:600;cursor:pointer;">${isPlaying ? '暫停播放' : '開始播放'}</button></div>`;
     }
     function toggleMusic() {
+      vibrate(20);
       if (isPlaying) { audio.pause(); isPlaying=false; } else { audio.play(); isPlaying=true; }
       renderMusicApp();
     }
 
     function renderWeatherApp() { appBody.innerHTML = `<div style="padding:40px;text-align:center;"><h2 style="font-size:24px;">新竹市 Zhubei</h2><div style="font-size:72px;margin:20px 0;font-weight:300;">26°C</div><p style="color:#8e8e93;font-size:16px;">晴朗舒適 · 濕度 65%</p></div>`; }
-    function renderClockApp() { appBody.innerHTML = `<div style="padding:50px;text-align:center;"><h2 style="font-size:48px;font-weight:300;">22:12:00</h2><p style="color:#8e8e93;margin-top:10px;">台北標準時間 (UTC+8)</p></div>`; }
+    function renderClockApp() { appBody.innerHTML = `<div style="padding:50px;text-align:center;"><h2 style="font-size:48px;font-weight:300;">22:15:00</h2><p style="color:#8e8e93;margin-top:10px;">台北標準時間 (UTC+8)</p></div>`; }
     function renderCalendarApp() { appBody.innerHTML = `<div style="padding:20px;text-align:center;"><h2 style="font-size:20px;margin-bottom:14px;">2026年 10月</h2><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;">${Array.from({length:31},(_,i)=>`<div style="padding:12px;background:#1c1c24;border-radius:10px;font-weight:600;">${i+1}</div>`).join('')}</div></div>`; }
-    function renderFilesApp() { appBody.innerHTML = `<div style="padding:20px;"><h2 style="font-size:20px;margin-bottom:14px;">檔案總管</h2><div style="background:#1c1c24;padding:16px;border-radius:14px;margin-top:10px;font-weight:600;">📁 500+ App 核心資料庫</div><div style="background:#1c1c24;padding:16px;border-radius:14px;margin-top:10px;font-weight:600;">📁 使用者多媒體檔案</div></div>`; }
+    function renderFilesApp() { appBody.innerHTML = `<div style="padding:20px;"><h2 style="font-size:20px;margin-bottom:14px;">檔案總管</h2><div style="background:#1c1c24;padding:16px;border-radius:14px;margin-top:10px;font-weight:600;">📁 400+ App 核心資料庫</div><div style="background:#1c1c24;padding:16px;border-radius:14px;margin-top:10px;font-weight:600;">📁 使用者多媒體檔案</div></div>`; }
     function renderNotesApp() { appBody.innerHTML = `<div style="padding:20px;"><textarea class="setting-input" style="height:300px;" placeholder="寫下你的備忘錄或靈感..."></textarea></div>`; }
     function renderGameApp() { appBody.innerHTML = `<div style="padding:20px;text-align:center;"><h2 style="font-size:20px;">貪食蛇遊戲</h2><canvas width="260" height="260" style="background:#000;border:2px solid #333;border-radius:14px;margin-top:15px;"></canvas></div>`; }
     function renderPaintApp() { appBody.innerHTML = `<div style="padding:20px;text-align:center;"><h2 style="font-size:20px;">繪圖板</h2><canvas width="320" height="340" style="background:#fff;border-radius:16px;margin-top:12px;"></canvas></div>`; }
@@ -727,3 +762,4 @@
   </script>
 </body>
 </html>
+
