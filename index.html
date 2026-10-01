@@ -10,10 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/0RHgQJcw/Background-Eraser.png">
-
-  <title>FRX OS 2 Ultimate Next-Gen Ecosystem</title>
+  <title>FRX OS 2 Ultimate Full-Featured Edition</title>
 
   <style>
     :root {
@@ -125,7 +122,7 @@
     .desktop-page {
       width: 100vw;
       height: 100%;
-      padding: calc(10px + var(--safe-top)) 20px calc(130px + var(--safe-bottom));
+      padding: calc(10px + var(--safe-top)) 20px calc(140px + var(--safe-bottom));
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -182,7 +179,7 @@
     /* Page Dots Indicator */
     .page-dots {
       position: absolute;
-      bottom: calc(105px + var(--safe-bottom));
+      bottom: calc(115px + var(--safe-bottom));
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -194,7 +191,7 @@
     }
     .page-dot.active { width: 18px; border-radius: 3px; background: #fff; }
 
-    /* Dock */
+    /* Dock (支援往上滑動展開另外4個App) */
     .dock-wrapper {
       position: absolute;
       bottom: calc(15px + var(--safe-bottom));
@@ -338,7 +335,7 @@
       <div class="page-dot" onclick="goToPage(2)"></div>
     </div>
 
-    <!-- Dock -->
+    <!-- Dock (支援往上滑動展開另外 4 個捷徑) -->
     <div class="dock-wrapper" id="dock-wrapper">
       <div class="dock-handle" id="dock-handle" onclick="toggleDock(event)"></div>
       <div class="dock-grid" id="dock-grid"></div>
@@ -362,7 +359,7 @@
       <div style="display:flex;flex-direction:column;gap:12px;">
         <div style="background:rgba(255,255,255,0.15);padding:14px;border-radius:16px;">
           <strong style="color:#34C759;">FRX 系統</strong>
-          <p style="font-size:13px;color:#ddd;margin-top:4px;">系統已載入 500+ 款生態應用程式與本機桌布設定。</p>
+          <p style="font-size:13px;color:#ddd;margin-top:4px;">系統已完整載入 500+ 生態應用程式與本機桌布設定引擎。</p>
         </div>
       </div>
     </div>
@@ -412,11 +409,19 @@
       { id: 'phone', name: '電話', icon: '📞', bg: 'linear-gradient(135deg, #34C759, #119922)' }
     ];
 
-    const dockApps = [
+    // Dock 預設 4 個，展開時可顯示另外 4 個總共 8 個
+    const defaultDockApps = [
       { id: 'phone', name: '電話', icon: '📞', bg: 'linear-gradient(135deg, #34C759, #119922)' },
       { id: 'browser', name: '瀏覽器', icon: '🌐', bg: 'linear-gradient(135deg, #55E0C4, #00A88F)' },
       { id: 'music', name: '音樂', icon: '🎵', bg: 'linear-gradient(135deg, #FF2D55, #D10040)' },
       { id: 'settings', name: '設定', icon: '⚙', bg: 'linear-gradient(135deg, #5856D6, #3634A3)' }
+    ];
+
+    const extraDockApps = [
+      { id: 'camera', name: '相機', icon: '📷', bg: 'linear-gradient(135deg, #FF9500, #FF5E00)' },
+      { id: 'photos', name: '相簿', icon: '🖼️', bg: 'linear-gradient(135deg, #34C759, #008E00)' },
+      { id: 'calc', name: '計算機', icon: '🧮', bg: 'linear-gradient(135deg, #FF9F0A, #FF7B00)' },
+      { id: 'notes', name: '記事本', icon: '📝', bg: 'linear-gradient(135deg, #FFCC00, #FFA000)' }
     ];
 
     // 自動生成 450+ 可下載應用程式
@@ -426,7 +431,7 @@
     for (let i = 1; i <= 460; i++) {
       storeApps.push({
         id: `store_app_${i}`,
-        name: `FRX 智能工具 ${i}`,
+        name: `FRX 智慧工具 ${i}`,
         icon: emojis[i % emojis.length],
         bg: `linear-gradient(135deg, hsl(${i * 35 % 360}, 70%, 55%), hsl(${i * 35 + 40 % 360}, 70%, 40%))`,
         category: categories[i % categories.length]
@@ -435,8 +440,6 @@
 
     // 狀態讀取
     let installedApps = JSON.parse(localStorage.getItem('frx_installed_apps')) || baseApps;
-    let userDockApps = JSON.parse(localStorage.getItem('frx_dock_apps')) || dockApps;
-    let downloadedStoreApps = JSON.parse(localStorage.getItem('frx_downloaded_store')) || [];
     let settings = JSON.parse(localStorage.getItem('frx_settings')) || {
       bgUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000',
       islandText: 'FRX Pro',
@@ -472,7 +475,8 @@
       // 渲染 Dock (預設4個，展開顯示另外4個)
       const dockGrid = document.getElementById('dock-grid');
       dockGrid.innerHTML = '';
-      userDockApps.slice(0, isDockExpanded ? 8 : 4).forEach(app => {
+      const activeDock = isDockExpanded ? [...defaultDockApps, ...extraDockApps] : defaultDockApps;
+      activeDock.forEach(app => {
         dockGrid.appendChild(createAppElem(app, true));
       });
 
@@ -558,17 +562,35 @@
     }
 
     /* Dock 向上滑動與向下點擊收回 */
+    const dockWrapper = document.getElementById('dock-wrapper');
+    let dockStartY = 0;
+    dockWrapper.addEventListener('touchstart', (e) => { dockStartY = e.touches[0].clientY; });
+    dockWrapper.addEventListener('touchend', (e) => {
+      let diff = e.changedTouches[0].clientY - dockStartY;
+      if (diff < -30 && !isDockExpanded) {
+        // 往上滑動展開
+        isDockExpanded = true;
+        dockWrapper.classList.add('expanded');
+        renderDesktop();
+      } else if (diff > 30 && isDockExpanded) {
+        // 往下滑動收回
+        isDockExpanded = false;
+        dockWrapper.classList.remove('expanded');
+        renderDesktop();
+      }
+    });
+
     function toggleDock(e) {
       e.stopPropagation();
       isDockExpanded = !isDockExpanded;
-      document.getElementById('dock-wrapper').classList.toggle('expanded', isDockExpanded);
+      dockWrapper.classList.toggle('expanded', isDockExpanded);
       renderDesktop();
     }
 
     function handleHomeBarClick() {
       if (isDockExpanded) {
         isDockExpanded = false;
-        document.getElementById('dock-wrapper').classList.remove('expanded');
+        dockWrapper.classList.remove('expanded');
         renderDesktop();
       } else {
         closeApp();
@@ -642,7 +664,7 @@
       appBody.innerHTML = `
         <div style="padding:16px;">
           <h2 style="font-size:20px;margin-bottom:12px;">🛍️ FRX 應用商店 (500+ App)</h2>
-          <p style="color:#8e8e93;font-size:13px;margin-bottom:16px;">下載應用程式將直接安裝至您的桌面主畫面。</p>
+          <p style="color:#8e8e93;font-size:13px;margin-bottom:16px;">點擊「取得」將直接下載安裝至桌面主畫面。</p>
           <div id="store-list" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
       `;
@@ -682,9 +704,9 @@
       appBody.innerHTML = `
         <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
           <div class="settings-group">
-            <div class="settings-title">🖼️ 桌布背景設定 (支援本機上傳)</div>
+            <div class="settings-title">🖼️ 桌布背景設定 (支援本機上傳圖片)</div>
             <input type="file" id="bg-file-input" accept="image/*" class="setting-input" style="margin-bottom:8px;" onchange="handleLocalWallpaper(event)">
-            <p style="font-size:11px;color:#8e8e93;">選擇您手機或電腦內的相片作為系統桌面。</p>
+            <p style="font-size:11px;color:#8e8e93;">直接從您的手機或電腦相簿選取圖片，套用為系統桌布。</p>
           </div>
 
           <div class="settings-group">
@@ -696,8 +718,8 @@
           <div class="settings-group">
             <div class="settings-title">⚙️ 系統資訊</div>
             <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>作業系統版本</span><span style="color:#8e8e93;">FRX OS 2.0 Ultimate</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>可用應用程式數</span><span style="color:#8e8e93;">500+ Apps</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>儲存空間</span><span style="color:#8e8e93;">182 GB / 512 GB</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>生態可用應用程式</span><span style="color:#8e8e93;">500+ Apps</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>內部儲存空間</span><span style="color:#8e8e93;">182 GB / 512 GB</span></div>
           </div>
         </div>
       `;
@@ -711,7 +733,7 @@
           settings.bgUrl = event.target.result;
           localStorage.setItem('frx_settings', JSON.stringify(settings));
           applySettings();
-          alert('✨ 本機桌布已成功設定！');
+          alert('✨ 本機桌布圖片已成功套用！');
         };
         reader.readAsDataURL(file);
       }
@@ -727,7 +749,7 @@
       }
     }
 
-    /* 內建實用工具實作 (相機、計算機、音樂、貪食蛇、繪圖等) */
+    /* 內建實用工具實作 */
     let videoStream = null;
     async function renderCameraApp() {
       appBody.innerHTML = `
